@@ -1,0 +1,80 @@
+# ------------------------------------------------------------
+# OS / Editor
+# ------------------------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+*.lnk
+
+# VS Code / JetBrains
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ------------------------------------------------------------
+# Logs / temp
+# ------------------------------------------------------------
+*.log
+logs/
+tmp/
+temp/
+
+# ------------------------------------------------------------
+# Node / JS tooling
+# ------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.bun/
+bun.lockb
+
+# Build output (common)
+dist/
+build/
+.cache/
+.parcel-cache/
+.svelte-kit/
+.next/
+out/
+coverage/
+
+# ------------------------------------------------------------
+# WordPress / LocalWP / environment
+# ------------------------------------------------------------
+# Keep this theme clean: ignore WP-specific runtime files if they appear
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backup*/
+wp-content/backups/
+wp-content/ai1wm-backups/
+wp-content/wflogs/
+wp-content/debug.log
+wp-content/*.log
+
+# LocalWP sometimes adds files you don't want in theme repos
+.localwp/
+.local/
+.env
+.env.*
+*.local
+
+# ------------------------------------------------------------
+# Composer (if ever used for tooling)
+# ------------------------------------------------------------
+vendor/
+composer.lock
+
+# ------------------------------------------------------------
+# Optional: ignore generated block assets if you decide to commit only sources
+# (Uncomment if you prefer not to track compiled CSS/JS.)
+# ------------------------------------------------------------
+# assets/*.min.css
+# assets/*.min.js
+# assets/build/

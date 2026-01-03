@@ -1,0 +1,44 @@
+# WordPress Coding Standards за MT Tickets block тема
+# https://developer.wordpress.org/coding-standards/wordpress-coding-standards/
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# PHP файлове
+[*.php]
+indent_style = tab
+indent_size = 4
+
+# CSS файлове
+[*.css]
+indent_style = space
+indent_size = 4
+
+# JavaScript файлове
+[*.js]
+indent_style = space
+indent_size = 4
+
+# JSON файлове (включително theme.json)
+[*.json]
+indent_style = space
+indent_size = 2
+
+# HTML файлове
+[*.html]
+indent_style = tab
+indent_size = 4
+
+# Markdown файлове
+[*.md]
+trim_trailing_whitespace = false
+
+# YAML файлове
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
