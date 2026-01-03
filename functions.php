@@ -49,6 +49,12 @@ add_action('admin_init', function () {
 		'default'           => 'For contact: 555 555 555',
 	));
 
+	register_setting('mt_tickets_settings', 'mt_tickets_logo_id', array(
+		'type'              => 'integer',
+		'sanitize_callback' => 'absint',
+		'default'           => 0,
+	));
+
 	add_settings_section(
 		'mt_tickets_header_section',
 		__('Header', 'mt-tickets'),
@@ -123,6 +129,26 @@ add_action('admin_init', function () {
 		'mt-tickets-settings',
 		'mt_tickets_header_section'
 	);
+
+	add_settings_field(
+		'mt_tickets_logo_id',
+		__('Header Logo', 'mt-tickets'),
+		function () {
+			$logo_id = (int) get_option('mt_tickets_logo_id', 0);
+			$logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : '';
+			$placeholder = get_theme_file_uri('assets/images/logo-placeholder.svg');
+
+			echo '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">';
+			echo '<img id="mt_tickets_logo_preview" src="' . esc_url($logo_url ?: $placeholder) . '" style="height:44px;width:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;padding:6px;">';
+			echo '<input type="hidden" id="mt_tickets_logo_id" name="mt_tickets_logo_id" value="' . esc_attr($logo_id) . '">';
+			echo '<button type="button" class="button button-secondary" id="mt_tickets_logo_select">' . esc_html__('Select logo', 'mt-tickets') . '</button>';
+			echo '<button type="button" class="button button-secondary" id="mt_tickets_logo_remove">' . esc_html__('Remove', 'mt-tickets') . '</button>';
+			echo '<p class="description" style="margin:0;flex-basis:100%;">' . esc_html__('Used in the header bar. If empty, a placeholder logo is shown.', 'mt-tickets') . '</p>';
+			echo '</div>';
+		},
+		'mt-tickets-settings',
+		'mt_tickets_header_section'
+	);
 });
 
 function mt_tickets_render_settings_page()
@@ -174,11 +200,10 @@ function mt_tickets_get_topbar_menu_info()
 add_action('init', function () {
 	$base = __DIR__ . '/blocks';
 
-	if (is_dir($base . '/topbar-left')) {
-		register_block_type($base . '/topbar-left');
-	}
-	if (is_dir($base . '/topbar-menu')) {
-		register_block_type($base . '/topbar-menu');
+	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons') as $b) {
+		if (is_dir($base . '/' . $b)) {
+			register_block_type($base . '/' . $b);
+		}
 	}
 });
 
@@ -220,6 +245,13 @@ add_action('wp_enqueue_scripts', function () {
 		array(),
 		wp_get_theme()->get('Version')
 	);
+	wp_enqueue_script(
+		'mt-tickets-ui',
+		get_theme_file_uri('assets/js/mt-tickets-ui.js'),
+		array(),
+		wp_get_theme()->get('Version'),
+		true
+	);
 });
 
 /**
@@ -227,7 +259,8 @@ add_action('wp_enqueue_scripts', function () {
  */
 add_action('after_setup_theme', function () {
 	register_nav_menus(array(
-		'mt_tickets_topbar' => __('Top Bar Menu', 'mt-tickets'),
+		'mt_tickets_topbar'  => __('Top Bar Menu', 'mt-tickets'),
+		'mt_tickets_primary' => __('Primary Menu', 'mt-tickets'),
 	));
 });
 
@@ -272,5 +305,64 @@ add_action('rest_api_init', function () {
 				),
 			);
 		},
+	));
+
+	register_rest_route('mt-tickets/v1', '/headerbar', array(
+		'methods'  => 'GET',
+		'permission_callback' => function () {
+			return current_user_can('edit_theme_options');
+		},
+		'callback' => function () {
+			$logo_id = (int) get_option('mt_tickets_logo_id', 0);
+			$logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : '';
+			$placeholder = get_theme_file_uri('assets/images/logo-placeholder.svg');
+
+			$assigned = has_nav_menu('mt_tickets_primary');
+			$items_out = array();
+
+			if ($assigned) {
+				$locations = get_nav_menu_locations();
+				$menu_id = (int)($locations['mt_tickets_primary'] ?? 0);
+				if ($menu_id) {
+					$items = wp_get_nav_menu_items($menu_id);
+					if (is_array($items)) {
+						foreach (array_slice($items, 0, 6) as $it) {
+							$items_out[] = array(
+								'title' => html_entity_decode((string)$it->title, ENT_QUOTES, 'UTF-8'),
+								'url'   => (string)$it->url,
+							);
+						}
+					}
+				}
+			}
+
+			return array(
+				'logo' => array(
+					'url' => $logo_url ?: $placeholder,
+				),
+				'menu' => array(
+					'assigned' => (bool)$assigned,
+					'items'    => $items_out,
+				),
+			);
+		},
+	));
+});
+
+add_action('admin_enqueue_scripts', function ($hook) {
+	if ($hook !== 'appearance_page_mt-tickets-settings') return;
+
+	wp_enqueue_media();
+
+	wp_enqueue_script(
+		'mt-tickets-admin-settings',
+		get_theme_file_uri('assets/js/admin-settings.js'),
+		array('jquery'),
+		wp_get_theme()->get('Version'),
+		true
+	);
+
+	wp_localize_script('mt-tickets-admin-settings', 'MT_TICKETS_ADMIN', array(
+		'placeholder' => get_theme_file_uri('assets/images/logo-placeholder.svg'),
 	));
 });

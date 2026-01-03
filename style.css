@@ -13,109 +13,227 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mt-tickets
 */
 
-.mt-topbar-left{
-	display:flex;
-	align-items:center;
-	gap:10px;
+.mt-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.mt-topbar-left__icon{
-	display:inline-flex;
-	color: var(--wp--preset--color--muted);
+.mt-topbar-left__icon {
+    display: inline-flex;
+    color: var(--wp--preset--color--muted);
 }
 
-.mt-topbar-left__icon svg{
-	display:block;
+.mt-topbar-left__icon svg {
+    display: block;
 }
 
-.mt-topbar-left__text{
-	color: var(--wp--preset--color--muted);
-	font-size:14px;
+.mt-topbar-left__text {
+    color: var(--wp--preset--color--muted);
+    font-size: 14px;
 }
 
-.mt-topbar-menu .menu{
-	display:flex;
-	gap:14px;
-	justify-content:flex-end;
-	list-style:none;
-	padding:0;
-	margin:0;
+.mt-topbar-menu .menu {
+    display: flex;
+    gap: 14px;
+    justify-content: flex-end;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.mt-topbar-menu .menu a{
-	color: var(--wp--preset--color--muted);
-	font-size:14px;
-	text-decoration:none;
+.mt-topbar-menu .menu a {
+    color: var(--wp--preset--color--muted);
+    font-size: 14px;
+    text-decoration: none;
 }
 
-.mt-topbar-menu .menu a:hover{
-	text-decoration:underline;
+.mt-topbar-menu .menu a:hover {
+    text-decoration: underline;
 }
 
 /* Top bar: fixed height + vertical centering */
-.mt-topbar{
-	min-height: 50px;
-	display: flex;
-	align-items: center;
+.mt-topbar {
+    min-height: 50px;
+    display: flex;
+    align-items: center;
 }
 
 /* IMPORTANT: make the constrained inner container stretch */
-.mt-topbar > .wp-block-group__inner-container{
-	flex: 1 1 auto;
-	width: 100%;
+.mt-topbar>.wp-block-group__inner-container {
+    flex: 1 1 auto;
+    width: 100%;
 }
 
 /* and make columns fill the container */
-.mt-topbar .wp-block-columns{
-	width: 100%;
-	margin: 0;
-	align-items: center;
+.mt-topbar .wp-block-columns {
+    width: 100%;
+    margin: 0;
+    align-items: center;
 }
 
 /* right column content to the right */
-.mt-topbar .wp-block-column:last-child{
-	display: flex;
-	justify-content: flex-end;
+.mt-topbar .wp-block-column:last-child {
+    display: flex;
+    justify-content: flex-end;
 }
 
 /* Mobile top bar tweaks */
-@media (max-width: 600px){
-	.mt-topbar{
-		min-height: auto; /* allow wrapping */
-		padding-top: 8px;
-		padding-bottom: 8px;
+@media (max-width: 600px) {
+    .mt-topbar {
+        min-height: auto;
+        /* allow wrapping */
+        padding-top: 8px;
+        padding-bottom: 8px;
         padding-left: 16px;
-		padding-right: 16px;
-	}
+        padding-right: 16px;
+    }
 
     /* If the constrained inner container fights it, keep it full-width */
-	.mt-topbar > .wp-block-group__inner-container{
-		width: 100%;
-	}
+    .mt-topbar>.wp-block-group__inner-container {
+        width: 100%;
+    }
 
-	/* Columns stack; keep spacing tight */
-	.mt-topbar .wp-block-columns{
-		gap: 8px;
-	}
+    /* Columns stack; keep spacing tight */
+    .mt-topbar .wp-block-columns {
+        gap: 8px;
+    }
 
-	/* If stacked, left align everything */
-	.mt-topbar .wp-block-column:last-child{
-		justify-content: flex-start;
-	}
+    /* If stacked, left align everything */
+    .mt-topbar .wp-block-column:last-child {
+        justify-content: flex-start;
+    }
 
-	/* Menu: allow wrap and reduce gap a bit */
-	.mt-topbar-menu .menu{
-		justify-content: flex-start;
-		gap: 10px;
-		flex-wrap: wrap;
-	}
+    /* Menu: allow wrap and reduce gap a bit */
+    .mt-topbar-menu .menu {
+        justify-content: flex-start;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
 
-	.mt-topbar-menu .menu a,
-	.mt-topbar-left__text{
-		font-size: 13px;
-	}
+    .mt-topbar-menu .menu a,
+    .mt-topbar-left__text {
+        font-size: 13px;
+    }
 
-	.mt-topbar-left{
-		gap: 8px;
-	}
+    .mt-topbar-left {
+        gap: 8px;
+    }
+
+    /* Header bar wrapper */
+    .mt-headerbar {
+        border-bottom: 1px solid var(--wp--preset--color--border);
+    }
+
+    /* Keep icons aligned */
+    .mt-header-icons {
+        display: flex;
+        gap: 14px;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .mt-header-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid var(--wp--preset--color--border);
+        border-radius: 12px;
+        background: #fff;
+        color: var(--wp--preset--color--text);
+        cursor: pointer;
+    }
+
+    /* Primary menu (desktop) */
+    .mt-primary-menu .menu {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .mt-primary-menu .menu a {
+        text-decoration: none;
+        color: var(--wp--preset--color--text);
+    }
+
+    .mt-primary-menu .menu a:hover {
+        text-decoration: underline;
+    }
+
+    /* Hamburger only on mobile */
+    .mt-hamburger {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border: 1px solid var(--wp--preset--color--border);
+        border-radius: 12px;
+        background: #fff;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 900px) {
+        .mt-primary-menu .menu {
+            display: none;
+        }
+
+        .mt-hamburger {
+            display: inline-flex;
+        }
+    }
+
+    /* Off-canvas panels */
+    .mt-panel {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+    }
+
+    .mt-panel.is-open {
+        display: block;
+    }
+
+    .mt-panel__overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+    }
+
+    .mt-panel__content {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: min(380px, 92vw);
+        background: #fff;
+        border-left: 1px solid var(--wp--preset--color--border);
+        padding: 16px;
+        overflow: auto;
+    }
+
+    .mt-panel__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .mt-panel__close {
+        border: 1px solid var(--wp--preset--color--border);
+        border-radius: 10px;
+        background: #fff;
+        padding: 8px 10px;
+        cursor: pointer;
+    }
+
+    html.mt-panel-open {
+        overflow: hidden;
+    }
 }

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="44" viewBox="0 0 180 44">
+  <rect x="1" y="1" width="178" height="42" rx="12" fill="#0B3D91"/>
+  <circle cx="28" cy="22" r="12" fill="#00A3A3"/>
+  <rect x="25" y="14" width="6" height="16" rx="3" fill="#F8FAFC"/>
+  <text x="52" y="28" font-family="Arial, sans-serif" font-size="18" fill="#F8FAFC">MT Tickets</text>
+</svg>
