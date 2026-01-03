@@ -12,3 +12,38 @@ License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mt-tickets
 */
+
+.mt-topbar-left{
+	display:flex;
+	align-items:center;
+	gap:10px;
+}
+
+.mt-topbar-left__icon{
+	display:inline-flex;
+	color: var(--wp--preset--color--muted);
+}
+
+.mt-topbar-left__text{
+	color: var(--wp--preset--color--muted);
+	font-size:14px;
+}
+
+.mt-topbar-menu .menu{
+	display:flex;
+	gap:14px;
+	justify-content:flex-end;
+	list-style:none;
+	padding:0;
+	margin:0;
+}
+
+.mt-topbar-menu .menu a{
+	color: var(--wp--preset--color--muted);
+	font-size:14px;
+	text-decoration:none;
+}
+
+.mt-topbar-menu .menu a:hover{
+	text-decoration:underline;
+}

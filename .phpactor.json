@@ -1,0 +1,28 @@
+{
+    "language_server_phpstan.enabled": false,
+    "language_server_psalm.enabled": false,
+    "completion_worse.completor.constructor.enabled": true,
+    "completion_worse.completor.docblock.enabled": true,
+    "completion_worse.completor.inherit.enabled": true,
+    "completion_worse.completor.smart.enabled": true,
+    "completion_worse.completor.static.enabled": true,
+    "completion_worse.completor.variable.enabled": true,
+    "core.autoloader": "composer",
+    "core.include_path": ".",
+    "indexer.exclude_patterns": [
+        "/vendor/**/tests/**",
+        "/vendor/**/test/**",
+        "/vendor/**/Test/**",
+        "/vendor/**/Tests/**"
+    ],
+    "indexer.include_patterns": [
+        "**/*.php"
+    ],
+    "language_server_worse_reflection.enabled": true,
+    "language_server_worse_reflection.stub_files": [
+        "vendor/php-stubs/wordpress-stubs/wordpress-stubs.php",
+        "vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php",
+        "vendor/php-stubs/wordpress-globals/wordpress-globals.php",
+        ".intelephense-stubs.php"
+    ]
+}

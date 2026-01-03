@@ -1,0 +1,27 @@
+{
+    "stubs": [
+        "vendor/php-stubs/wordpress-stubs/wordpress-stubs.php",
+        "vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php",
+        "vendor/php-stubs/wordpress-globals/wordpress-globals.php",
+        ".intelephense-stubs.php"
+    ],
+    "files.associations": {
+        "*.php": "php"
+    },
+    "completion.triggerParameterHints": true,
+    "diagnostics.enable": true,
+    "diagnostics.runOnType": true,
+    "diagnostics.runOnSave": true,
+    "files.exclude": [
+        "**/vendor/**/tests/**",
+        "**/vendor/**/test/**",
+        "**/vendor/**/Test/**",
+        "**/vendor/**/Tests/**",
+        "**/node_modules/**"
+    ],
+    "includePaths": [
+        "vendor/php-stubs/wordpress-stubs",
+        "vendor/php-stubs/woocommerce-stubs",
+        "vendor/php-stubs/wordpress-globals"
+    ]
+}
