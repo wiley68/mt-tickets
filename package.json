@@ -1,0 +1,24 @@
+{
+  "name": "mt-tickets-theme",
+  "version": "0.1.0",
+  "description": "Block theme starter for a bus ticket / carrier ticketing website",
+  "main": "functions.php",
+  "scripts": {
+    "makepot": "wp i18n make-pot . languages/mt-tickets.pot --domain=mt-tickets --exclude=node_modules,vendor",
+    "makemo": "wp i18n make-mo languages/",
+    "update-po": "wp i18n update-po languages/mt-tickets.pot languages/",
+    "i18n": "npm run makepot && npm run makemo"
+  },
+  "keywords": [
+    "wordpress",
+    "theme",
+    "block-theme",
+    "bus-tickets",
+    "i18n"
+  ],
+  "author": "Ilko Ivanov",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@wordpress/scripts": "^27.0.0"
+  }
+}

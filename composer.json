@@ -1,0 +1,31 @@
+{
+    "name": "mt-tickets/mt-tickets-theme",
+    "description": "Block theme starter for a bus ticket / carrier ticketing website",
+    "type": "wordpress-theme",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Ilko Ivanov",
+            "email": "ilko@avalonbg.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "php-stubs/wordpress-stubs": "^6.0",
+        "php-stubs/wordpress-globals": "^0.1.0",
+        "php-stubs/woocommerce-stubs": "^8.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-stubs/generator": true
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "echo 'WordPress stubs installed. Restart your IDE for better IntelliSense.'"
+        ],
+        "post-update-cmd": [
+            "echo 'WordPress stubs updated. Restart your IDE for better IntelliSense.'"
+        ]
+    }
+}

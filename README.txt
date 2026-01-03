@@ -21,6 +21,49 @@ This theme focuses on:
 * A structured footer with multiple columns and a bottom menu area
 * A design token approach via theme.json for consistent typography, spacing, and colors
 
+== Internationalization ==
+
+MT Tickets supports multiple languages and comes with translations for English and Bulgarian.
+
+### Available Languages
+* English (en_US) - default
+* Bulgarian (bg_BG) - included
+
+### Adding New Languages
+
+1. **Using WP-CLI** (recommended):
+   ```bash
+   # Generate/update POT file
+   wp i18n make-pot . languages/mt-tickets.pot --domain=mt-tickets --exclude=node_modules,vendor
+
+   # Create PO file for a new language (e.g., German)
+   wp i18n make-po languages/mt-tickets.pot languages/mt-tickets-de_DE.po
+
+   # Generate MO file
+   wp i18n make-mo languages/mt-tickets-de_DE.po
+   ```
+
+2. **Using npm scripts** (if WP-CLI is not available):
+   ```bash
+   npm install
+   npm run i18n
+   ```
+
+3. **Manual translation**:
+   - Copy `languages/mt-tickets.pot` to `languages/mt-tickets-[locale].po`
+   - Edit the PO file with a translation editor like Poedit
+   - Save to generate the MO file automatically
+
+### Translating Theme Strings
+
+When adding new translatable strings in PHP files, use WordPress gettext functions:
+```php
+__('Text to translate', 'mt-tickets')
+_e('Text to echo', 'mt-tickets')
+_x('Context-specific text', 'context', 'mt-tickets')
+_n('Single item', 'Multiple items', $count, 'mt-tickets')
+```
+
 == Installation ==
 
 1. Upload the `mt-tickets` folder to the `/wp-content/themes/` directory, or install via Appearance > Themes > Add New > Upload Theme.
