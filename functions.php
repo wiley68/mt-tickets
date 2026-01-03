@@ -94,6 +94,35 @@ add_action('admin_init', function () {
 		'mt-tickets-settings',
 		'mt_tickets_header_section'
 	);
+
+	add_settings_field(
+		'mt_tickets_topbar_menu_hint',
+		__('Top Bar Menu', 'mt-tickets'),
+		function () {
+			$menus_url     = admin_url('nav-menus.php');
+			$locations_url = admin_url('nav-menus.php?action=locations');
+
+			$info = mt_tickets_get_topbar_menu_info();
+
+			echo '<p class="description">';
+			echo esc_html__('Right side of the top bar is a WordPress menu assigned to the "Top Bar Menu" location.', 'mt-tickets');
+			echo '</p>';
+
+			if ($info['assigned']) {
+				$name = $info['menu_name'] ?: __('(assigned)', 'mt-tickets');
+				echo '<p><strong>' . esc_html__('Current:', 'mt-tickets') . '</strong> ' . esc_html($name) . '</p>';
+			} else {
+				echo '<p style="color:#b32d2e;"><strong>' . esc_html__('Current:', 'mt-tickets') . '</strong> ' . esc_html__('Not assigned', 'mt-tickets') . '</p>';
+			}
+
+			echo '<p>';
+			echo '<a class="button button-secondary" href="' . esc_url($menus_url) . '">' . esc_html__('Manage Menus', 'mt-tickets') . '</a> ';
+			echo '<a class="button button-secondary" style="margin-left:6px" href="' . esc_url($locations_url) . '">' . esc_html__('Menu Locations', 'mt-tickets') . '</a>';
+			echo '</p>';
+		},
+		'mt-tickets-settings',
+		'mt_tickets_header_section'
+	);
 });
 
 function mt_tickets_render_settings_page()
@@ -109,14 +138,34 @@ function mt_tickets_render_settings_page()
 			submit_button();
 			?>
 		</form>
-
-		<hr>
-		<p>
-			<strong><?php echo esc_html__('Top Bar Menu:', 'mt-tickets'); ?></strong>
-			<?php echo esc_html__('Assign a menu to the "Top Bar Menu" location.', 'mt-tickets'); ?>
-		</p>
 	</div>
 <?php
+}
+
+function mt_tickets_get_topbar_menu_info()
+{
+	$assigned = has_nav_menu('mt_tickets_topbar');
+
+	$menu_id = 0;
+	$menu_name = '';
+
+	if ($assigned) {
+		$locations = get_nav_menu_locations();
+		$menu_id = (int) ($locations['mt_tickets_topbar'] ?? 0);
+
+		if ($menu_id) {
+			$term = get_term($menu_id, 'nav_menu');
+			if ($term && !is_wp_error($term)) {
+				$menu_name = (string) $term->name;
+			}
+		}
+	}
+
+	return array(
+		'assigned'  => $assigned,
+		'menu_id'   => $menu_id,
+		'menu_name' => $menu_name,
+	);
 }
 
 /**
@@ -179,5 +228,49 @@ add_action('wp_enqueue_scripts', function () {
 add_action('after_setup_theme', function () {
 	register_nav_menus(array(
 		'mt_tickets_topbar' => __('Top Bar Menu', 'mt-tickets'),
+	));
+});
+
+add_action('rest_api_init', function () {
+	register_rest_route('mt-tickets/v1', '/topbar', array(
+		'methods'  => 'GET',
+		'permission_callback' => function () {
+			// Site Editor users
+			return current_user_can('edit_theme_options');
+		},
+		'callback' => function () {
+
+			$icon = get_option('mt_tickets_topbar_icon', 'phone');
+			$text = get_option('mt_tickets_topbar_text', 'For contact: 555 555 555');
+
+			$assigned = has_nav_menu('mt_tickets_topbar');
+
+			$items_out = array();
+			if ($assigned) {
+				$locations = get_nav_menu_locations();
+				$menu_id = $locations['mt_tickets_topbar'] ?? 0;
+
+				if ($menu_id) {
+					$items = wp_get_nav_menu_items($menu_id);
+					if (is_array($items)) {
+						foreach (array_slice($items, 0, 4) as $it) {
+							$items_out[] = array(
+								'title' => html_entity_decode((string) $it->title, ENT_QUOTES, 'UTF-8'),
+								'url'   => (string) $it->url,
+							);
+						}
+					}
+				}
+			}
+
+			return array(
+				'icon' => $icon,
+				'text' => $text,
+				'menu' => array(
+					'assigned' => (bool) $assigned,
+					'items'    => $items_out,
+				),
+			);
+		},
 	));
 });
