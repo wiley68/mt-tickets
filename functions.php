@@ -252,6 +252,24 @@ add_action('wp_enqueue_scripts', function () {
 		wp_get_theme()->get('Version'),
 		true
 	);
+
+	// Enqueue header icons frontend JavaScript
+	// Load when WooCommerce is active (since cart functionality depends on it)
+	if (class_exists('WooCommerce')) {
+		wp_enqueue_script(
+			'mt-tickets-header-icons-frontend',
+			get_theme_file_uri('blocks/header-icons/frontend.js'),
+			array('jquery'),
+			wp_get_theme()->get('Version'),
+			true
+		);
+
+		// Localize script for AJAX
+		wp_localize_script('mt-tickets-header-icons-frontend', 'mt_tickets_ajax', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce'    => wp_create_nonce('mt_tickets_cart_nonce'),
+		));
+	}
 });
 
 /**
@@ -342,6 +360,71 @@ add_action('rest_api_init', function () {
 		},
 	));
 });
+
+/**
+ * AJAX handlers for mini cart functionality
+ */
+add_action('wp_ajax_mt_update_cart_item_quantity', 'mt_update_cart_item_quantity');
+add_action('wp_ajax_nopriv_mt_update_cart_item_quantity', 'mt_update_cart_item_quantity');
+
+function mt_update_cart_item_quantity()
+{
+	check_ajax_referer('mt_tickets_cart_nonce', 'nonce');
+
+	if (!isset($_POST['cart_item_key']) || !isset($_POST['quantity'])) {
+		wp_send_json_error('Missing parameters');
+		return;
+	}
+
+	$cart_item_key = sanitize_text_field($_POST['cart_item_key']);
+	$quantity = intval($_POST['quantity']);
+
+	if ($quantity < 1) {
+		wp_send_json_error('Invalid quantity');
+		return;
+	}
+
+	$original_quantity = WC()->cart->get_cart_item($cart_item_key)['quantity'];
+
+	$result = WC()->cart->set_quantity($cart_item_key, $quantity);
+
+	if ($result) {
+		WC()->cart->calculate_totals();
+		wp_send_json_success(array(
+			'cart_total' => WC()->cart->get_cart_total(),
+			'cart_count' => WC()->cart->get_cart_contents_count(),
+		));
+	} else {
+		wp_send_json_error('Failed to update quantity');
+	}
+}
+
+add_action('wp_ajax_mt_remove_cart_item', 'mt_remove_cart_item');
+add_action('wp_ajax_nopriv_mt_remove_cart_item', 'mt_remove_cart_item');
+
+function mt_remove_cart_item()
+{
+	check_ajax_referer('mt_tickets_cart_nonce', 'nonce');
+
+	if (!isset($_POST['cart_item_key'])) {
+		wp_send_json_error('Missing cart item key');
+		return;
+	}
+
+	$cart_item_key = sanitize_text_field($_POST['cart_item_key']);
+
+	$result = WC()->cart->remove_cart_item($cart_item_key);
+
+	if ($result) {
+		WC()->cart->calculate_totals();
+		wp_send_json_success(array(
+			'cart_total' => WC()->cart->get_cart_total(),
+			'cart_count' => WC()->cart->get_cart_contents_count(),
+		));
+	} else {
+		wp_send_json_error('Failed to remove item');
+	}
+}
 
 add_action('admin_enqueue_scripts', function ($hook) {
 	if ($hook !== 'appearance_page_mt-tickets-settings') return;

@@ -445,17 +445,23 @@ Text Domain: mt-tickets
     top: 0;
     right: 0;
     height: 100%;
-    width: min(380px, 92vw);
+    width: min(460px, 92vw);
     background: #fff;
     border-left: 1px solid var(--wp--preset--color--border);
-    padding: 16px;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .mt-panel__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-shrink: 0;
+    /* Prevent header from shrinking */
+    border-bottom: 1px solid var(--wp--preset--color--border);
+    background: var(--wp--preset--color--surface);
+    padding: 12px 16px;
     margin-bottom: 12px;
 }
 
@@ -511,4 +517,239 @@ html.mt-panel-open {
     padding: 8px 14px 8px 22px;
     /* slight indent */
     background: transparent;
+}
+
+/* =========================
+   MINI CART
+   ========================= */
+
+.mt-mini-cart {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    /* Fill all available space */
+}
+
+.mt-mini-cart-empty {
+    padding: 24px 0;
+    text-align: center;
+    color: var(--wp--preset--color--muted);
+}
+
+.mt-mini-cart-items {
+    margin-bottom: 16px;
+}
+
+.mt-cart-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--wp--preset--color--border);
+}
+
+.mt-cart-item:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.mt-cart-item-image {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--wp--preset--color--surface);
+}
+
+.mt-cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mt-cart-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mt-cart-item-name {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.mt-cart-item-name a {
+    color: var(--wp--preset--color--text);
+    text-decoration: none;
+}
+
+.mt-cart-item-name a:hover {
+    color: var(--wp--preset--color--primary);
+    text-decoration: underline;
+}
+
+.mt-cart-item-price {
+    font-size: 14px;
+    color: var(--wp--preset--color--muted);
+    margin-bottom: 8px;
+}
+
+.mt-cart-item-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.mt-cart-item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--wp--preset--color--border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.mt-qty-btn {
+    width: 28px;
+    height: 28px;
+    border: 0;
+    background: var(--wp--preset--color--surface);
+    color: var(--wp--preset--color--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background 0.15s ease;
+}
+
+.mt-qty-btn:hover {
+    background: var(--wp--preset--color--border);
+}
+
+.mt-qty-btn:active {
+    background: var(--wp--preset--color--muted);
+}
+
+.mt-qty-input {
+    width: 40px;
+    height: 28px;
+    border: 0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    background: #fff;
+}
+
+.mt-qty-input:focus {
+    outline: 2px solid var(--wp--preset--color--primary);
+    outline-offset: -2px;
+}
+
+.mt-cart-item-remove {
+    padding: 6px 12px;
+    border: 1px solid var(--wp--preset--color--border);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--wp--preset--color--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.mt-cart-item-remove:hover {
+    background: var(--wp--preset--color--border);
+    color: var(--wp--preset--color--text);
+}
+
+.mt-cart-summary {
+    border-top: 1px solid var(--wp--preset--color--border);
+    padding-top: 12px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+    /* Prevent summary from shrinking */
+}
+
+.mt-cart-total {
+    text-align: center;
+    font-size: 16px;
+}
+
+.mt-cart-total strong {
+    color: var(--wp--preset--color--text);
+}
+
+.mt-mini-cart-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+    /* Prevent footer from shrinking */
+    border-top: 1px solid var(--wp--preset--color--border);
+    padding: 16px;
+    margin-top: auto;
+    /* Push footer to bottom */
+}
+
+.mt-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 0;
+}
+
+.mt-btn-primary {
+    background: var(--wp--preset--color--primary);
+    color: #fff;
+}
+
+.mt-btn-primary:hover {
+    background: var(--wp--preset--color--accent);
+}
+
+.mt-btn-secondary {
+    background: #fff;
+    color: var(--wp--preset--color--text);
+    border: 1px solid var(--wp--preset--color--border);
+}
+
+.mt-btn-secondary:hover {
+    background: var(--wp--preset--color--surface);
+}
+
+/* Mobile adjustments for mini cart */
+@media (max-width: 600px) {
+    .mt-cart-item {
+        gap: 8px;
+    }
+
+    .mt-cart-item-image {
+        width: 80px;
+        height: 80px;
+    }
+
+    .mt-cart-item-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .mt-cart-item-quantity {
+        justify-content: center;
+    }
+
+    .mt-cart-item-remove {
+        width: 100%;
+    }
 }
