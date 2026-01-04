@@ -602,6 +602,17 @@ html.mt-panel-open {
     align-items: center;
 }
 
+/* Loading state for cart items */
+.mt-cart-item.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.mt-cart-item.loading .mt-qty-btn {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .mt-cart-item-quantity {
     display: flex;
     align-items: center;
@@ -663,6 +674,11 @@ html.mt-panel-open {
 .mt-cart-item-remove:hover {
     background: var(--wp--preset--color--border);
     color: var(--wp--preset--color--text);
+}
+
+.mt-cart-item-remove:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .mt-cart-summary {
