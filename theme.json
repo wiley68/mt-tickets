@@ -37,6 +37,11 @@
           "name": "Border",
           "slug": "border",
           "color": "#E2E8F0"
+        },
+        {
+          "name": "Background",
+          "slug": "background",
+          "color": "#FFFFFF"
         }
       ]
     },
@@ -98,7 +103,7 @@
     },
     "color": {
       "text": "var(--wp--preset--color--text)",
-      "background": "#FFFFFF"
+      "background": "var(--wp--preset--color--background)"
     },
     "elements": {
       "link": {

@@ -69,12 +69,26 @@ function mt_tickets_svg_cart()
 	<div class="mt-panel__overlay"></div>
 	<div class="mt-panel__content" role="dialog" aria-label="<?php echo esc_attr__('Cart', 'mt-tickets'); ?>">
 		<div class="mt-panel__header">
-			<strong><?php echo esc_html__('Cart', 'mt-tickets'); ?></strong>
+			<strong>
+				<?php echo esc_html__('Cart', 'mt-tickets'); ?>
+				<?php if ($cart_count !== null && $cart_count > 0) : ?>
+					<span class="mt-panel-counter">(<?php echo (int)$cart_count; ?>)</span>
+				<?php endif; ?>
+			</strong>
 			<button class="mt-panel__close" type="button" data-mt-close>✕</button>
 		</div>
 		<?php
 		if ($has_woo) {
-			echo do_shortcode('[woocommerce_mini_cart]');
+			echo '<div class="mt-mini-cart">';
+			if (function_exists('woocommerce_mini_cart')) {
+				ob_start();
+				woocommerce_mini_cart();
+				echo ob_get_clean();
+			} else {
+				// fallback (ако някога функцията липсва)
+				echo do_shortcode('[woocommerce_mini_cart]');
+			}
+			echo '</div>';
 		} else {
 			echo '<p>' . esc_html__('Mini cart placeholder (will be provided by the ticketing/commerce plugin).', 'mt-tickets') . '</p>';
 		}

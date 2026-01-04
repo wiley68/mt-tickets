@@ -471,6 +471,23 @@ html.mt-panel-open {
     overflow: hidden;
 }
 
+/* Panel typography + token-based colors */
+.mt-panel__content {
+    background: var(--wp--preset--color--background, #fff);
+    color: var(--wp--preset--color--text, #0f172a);
+}
+
+/* Header: title + counter */
+.mt-panel__header strong {
+    font-size: 16px;
+}
+
+.mt-panel-counter {
+    margin-left: 6px;
+    color: var(--wp--preset--color--muted, #64748b);
+    font-weight: 600;
+}
+
 /* Off-canvas menu list vertical */
 .mt-panel .mt-primary-menu__list {
     display: flex;
