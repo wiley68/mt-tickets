@@ -13,6 +13,9 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mt-tickets
 */
 
+/* =========================
+   TOP BAR
+   ========================= */
 .mt-topbar-left {
     display: flex;
     align-items: center;
@@ -119,121 +122,376 @@ Text Domain: mt-tickets
     .mt-topbar-left {
         gap: 8px;
     }
+}
 
-    /* Header bar wrapper */
+/* =========================
+   HEADER BAR
+   ========================= */
+.mt-headerbar {
+    border-bottom: 1px solid var(--wp--preset--color--border);
+}
+
+/* Header bar: fixed height + vertical centering */
+.mt-headerbar {
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+}
+
+/* Make constrained inner container stretch full width */
+.mt-headerbar>.wp-block-group__inner-container {
+    flex: 1 1 auto;
+    width: 100%;
+}
+
+/* Center columns vertically and remove default margins */
+.mt-headerbar .wp-block-columns {
+    width: 100%;
+    margin: 0;
+    align-items: center;
+}
+
+.mt-headerbar .wp-block-column:last-child {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.mt-headerbar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #fff;
+}
+
+/* Icons (right column) */
+.mt-header-icons {
+    display: flex;
+    gap: 14px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.mt-header-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--wp--preset--color--border);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--wp--preset--color--text);
+    cursor: pointer;
+}
+
+/* Allow badge positioning */
+.mt-header-icon-btn {
+    position: relative;
+}
+
+/* Cart badge */
+.mt-cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    border: 1px solid var(--wp--preset--color--border);
+    background: #fff;
+    color: var(--wp--preset--color--text);
+    font-size: 12px;
+    line-height: 18px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Primary menu (desktop) */
+.mt-primary-menu {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+
+.mt-primary-menu__list {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mt-primary-menu__list>li {
+    margin: 0;
+    padding: 0;
+}
+
+.mt-primary-menu__list a {
+    text-decoration: none;
+    color: var(--wp--preset--color--text);
+    display: inline-flex;
+    padding: 10px 8px;
+    /* nicer click area */
+}
+
+.mt-primary-menu__list a:hover {
+    text-decoration: underline;
+}
+
+/* Hamburger only on mobile (<=900px) */
+.mt-hamburger {
+    display: none;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--wp--preset--color--border);
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Make top-level items slightly bolder */
+.mt-primary-menu__list>.menu-item>a {
+    font-weight: 600;
+    position: relative;
+    text-decoration: none;
+}
+
+/* Underline effect (animated-ish, simple) */
+.mt-primary-menu__list>.menu-item>a::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 6px;
+    height: 2px;
+    background: currentColor;
+    opacity: 0;
+    transform: scaleX(0.6);
+    transform-origin: left;
+    transition: opacity .15s ease, transform .15s ease;
+}
+
+/* Hover: change color + show underline */
+.mt-primary-menu__list>.menu-item>a:hover {
+    color: var(--wp--preset--color--primary, #0B3D91);
+}
+
+.mt-primary-menu__list>.menu-item>a:hover::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+/* Dropdown basics */
+.mt-primary-menu__list>.menu-item {
+    position: relative;
+}
+
+/* Hide submenus by default */
+.mt-primary-menu__list .sub-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    min-width: 220px;
+    padding: 10px 0;
+    margin: 0;
+    list-style: none;
+
+    background: #fff;
+    border: 1px solid var(--wp--preset--color--border);
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+    z-index: 60;
+}
+
+/* Hover bridge to prevent closing when moving mouse to dropdown */
+.mt-primary-menu__list>.menu-item-has-children::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 10px;
+    /* hover buffer */
+}
+
+/* Show submenu on hover (desktop) */
+.mt-primary-menu__list>.menu-item:hover>.sub-menu {
+    display: block;
+}
+
+/* Dropdown indicator */
+.mt-primary-menu__list>.menu-item-has-children>a {
+    padding-right: 24px;
+}
+
+.mt-primary-menu__list>.menu-item-has-children>a::before {
+    content: "";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(-50%) rotate(45deg);
+    opacity: 0.75;
+}
+
+/* Submenu links */
+.mt-primary-menu__list .sub-menu a {
+    display: block;
+    padding: 10px 14px;
+    text-decoration: none;
+    font-weight: 400;
+    color: var(--wp--preset--color--text);
+}
+
+/* Submenu hover: color only, no underline */
+.mt-primary-menu__list .sub-menu a:hover {
+    color: var(--wp--preset--color--primary, #0B3D91);
+    text-decoration: none;
+    background: rgba(11, 61, 145, 0.06);
+}
+
+/* If menu is near the right edge, open dropdown to the left */
+.mt-primary-menu__list>.menu-item:last-child>.sub-menu,
+.mt-primary-menu__list>.menu-item:nth-last-child(2)>.sub-menu {
+    left: auto;
+    right: 0;
+}
+
+@media (max-width: 900px) {
+
+    /* Hide the entire first column (logo column) so it doesn't take space */
+    .mt-headerbar .wp-block-columns>.wp-block-column:first-child {
+        display: none !important;
+    }
+
+    /* padding so elements don't stick to edges */
     .mt-headerbar {
-        border-bottom: 1px solid var(--wp--preset--color--border);
+        padding-left: 16px;
+        padding-right: 16px;
+        min-height: 64px;
+        /* optional */
     }
 
-    /* Keep icons aligned */
-    .mt-header-icons {
+    /* hide logo */
+    .mt-headerbar .mt-header-logo {
+        display: none !important;
+    }
+
+    /* FORCE columns to stay in one row */
+    .mt-headerbar .wp-block-columns {
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 12px;
+    }
+
+    /* The menu column (middle) should not take full width */
+    .mt-headerbar .wp-block-column {
+        flex-basis: auto !important;
+        flex-grow: 0 !important;
+    }
+
+    /* middle column holds hamburger (left side) */
+    .mt-headerbar .wp-block-column:nth-child(2) {
         display: flex;
-        gap: 14px;
+        justify-content: flex-start;
+    }
+
+    /* right column holds icons (right side) */
+    .mt-headerbar .wp-block-column:last-child {
+        display: flex;
         justify-content: flex-end;
-        align-items: center;
     }
 
-    .mt-header-icon-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border: 1px solid var(--wp--preset--color--border);
-        border-radius: 12px;
-        background: #fff;
-        color: var(--wp--preset--color--text);
-        cursor: pointer;
-    }
-
-    /* Primary menu (desktop) */
-    .mt-primary-menu .menu {
-        display: flex;
-        justify-content: center;
-        gap: 18px;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .mt-primary-menu .menu a {
-        text-decoration: none;
-        color: var(--wp--preset--color--text);
-    }
-
-    .mt-primary-menu .menu a:hover {
-        text-decoration: underline;
-    }
-
-    /* Hamburger only on mobile */
+    /* ensure hamburger visible on mobile */
     .mt-hamburger {
-        display: none;
-        width: 40px;
-        height: 40px;
-        border: 1px solid var(--wp--preset--color--border);
-        border-radius: 12px;
-        background: #fff;
-        cursor: pointer;
-        align-items: center;
-        justify-content: center;
+        display: inline-flex;
     }
 
-    @media (max-width: 900px) {
-        .mt-primary-menu .menu {
-            display: none;
-        }
-
-        .mt-hamburger {
-            display: inline-flex;
-        }
-    }
-
-    /* Off-canvas panels */
-    .mt-panel {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
+    /* hide desktop horizontal menu list */
+    .mt-primary-menu__list {
         display: none;
     }
+}
 
-    .mt-panel.is-open {
-        display: block;
-    }
+/* Off-canvas panels */
+.mt-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+}
 
-    .mt-panel__overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.45);
-    }
+.mt-panel.is-open {
+    display: block;
+}
 
-    .mt-panel__content {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: min(380px, 92vw);
-        background: #fff;
-        border-left: 1px solid var(--wp--preset--color--border);
-        padding: 16px;
-        overflow: auto;
-    }
+.mt-panel__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+}
 
-    .mt-panel__header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-    }
+.mt-panel__content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(380px, 92vw);
+    background: #fff;
+    border-left: 1px solid var(--wp--preset--color--border);
+    padding: 16px;
+    overflow: auto;
+}
 
-    .mt-panel__close {
-        border: 1px solid var(--wp--preset--color--border);
-        border-radius: 10px;
-        background: #fff;
-        padding: 8px 10px;
-        cursor: pointer;
-    }
+.mt-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
 
-    html.mt-panel-open {
-        overflow: hidden;
-    }
+.mt-panel__close {
+    border: 1px solid var(--wp--preset--color--border);
+    border-radius: 10px;
+    background: #fff;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+html.mt-panel-open {
+    overflow: hidden;
+}
+
+/* Off-canvas menu list vertical */
+.mt-panel .mt-primary-menu__list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* Off-canvas: always show submenus */
+.mt-panel .mt-primary-menu__list .sub-menu {
+    display: block;
+    position: static;
+    min-width: auto;
+    border: 0;
+    box-shadow: none;
+    padding: 6px 0 0;
+    margin: 0;
+}
+
+.mt-panel .mt-primary-menu__list .sub-menu a {
+    padding: 8px 14px 8px 22px;
+    /* slight indent */
+    background: transparent;
 }

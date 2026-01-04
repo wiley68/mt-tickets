@@ -279,19 +279,15 @@ add_action('rest_api_init', function () {
 			$assigned = has_nav_menu('mt_tickets_topbar');
 
 			$items_out = array();
+			$menu_name = '';
 			if ($assigned) {
 				$locations = get_nav_menu_locations();
 				$menu_id = $locations['mt_tickets_topbar'] ?? 0;
 
 				if ($menu_id) {
-					$items = wp_get_nav_menu_items($menu_id);
-					if (is_array($items)) {
-						foreach (array_slice($items, 0, 4) as $it) {
-							$items_out[] = array(
-								'title' => html_entity_decode((string) $it->title, ENT_QUOTES, 'UTF-8'),
-								'url'   => (string) $it->url,
-							);
-						}
+					$term = get_term((int)$menu_id, 'nav_menu');
+					if ($term && !is_wp_error($term)) {
+						$menu_name = (string) $term->name;
 					}
 				}
 			}
@@ -301,6 +297,7 @@ add_action('rest_api_init', function () {
 				'text' => $text,
 				'menu' => array(
 					'assigned' => (bool) $assigned,
+					'name'     => $menu_name,
 					'items'    => $items_out,
 				),
 			);
@@ -318,20 +315,16 @@ add_action('rest_api_init', function () {
 			$placeholder = get_theme_file_uri('assets/images/logo-placeholder.svg');
 
 			$assigned = has_nav_menu('mt_tickets_primary');
+			$menu_name = '';
 			$items_out = array();
 
 			if ($assigned) {
 				$locations = get_nav_menu_locations();
 				$menu_id = (int)($locations['mt_tickets_primary'] ?? 0);
 				if ($menu_id) {
-					$items = wp_get_nav_menu_items($menu_id);
-					if (is_array($items)) {
-						foreach (array_slice($items, 0, 6) as $it) {
-							$items_out[] = array(
-								'title' => html_entity_decode((string)$it->title, ENT_QUOTES, 'UTF-8'),
-								'url'   => (string)$it->url,
-							);
-						}
+					$term = get_term((int)$menu_id, 'nav_menu');
+					if ($term && !is_wp_error($term)) {
+						$menu_name = (string) $term->name;
 					}
 				}
 			}
@@ -342,6 +335,7 @@ add_action('rest_api_init', function () {
 				),
 				'menu' => array(
 					'assigned' => (bool)$assigned,
+					'name'     => $menu_name,
 					'items'    => $items_out,
 				),
 			);

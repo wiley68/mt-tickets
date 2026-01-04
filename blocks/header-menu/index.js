@@ -4,24 +4,43 @@ wp.domReady(function () {
     const useEffect = wp.element.useEffect;
 
     if (!window.mtTicketsHeaderbarPromise) {
-        window.mtTicketsHeaderbarPromise = wp.apiFetch({ path: '/mt-tickets/v1/headerbar' }).catch(() => null);
+        window.mtTicketsHeaderbarPromise = wp.apiFetch({ path: '/mt-tickets/v1/headerbar' })
+            .catch(function () { return null; });
+    }
+
+    function labelStyle() {
+        return {
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '8px 10px',
+            border: '1px dashed #cbd5e1',
+            borderRadius: '10px',
+            fontSize: '13px',
+            lineHeight: '1',
+            opacity: 0.9
+        };
     }
 
     wp.blocks.registerBlockType('mt-tickets/header-menu', {
         edit: function () {
             const [data, setData] = useState(null);
-            useEffect(() => { window.mtTicketsHeaderbarPromise.then(d => d && setData(d)); }, []);
+
+            useEffect(function () {
+                window.mtTicketsHeaderbarPromise.then(function (d) {
+                    if (d) setData(d);
+                });
+            }, []);
 
             const assigned = !!(data && data.menu && data.menu.assigned);
-            const items = (data && data.menu && Array.isArray(data.menu.items)) ? data.menu.items : [];
+            const name = (data && data.menu && data.menu.name) ? data.menu.name : '';
 
-            const list = assigned && items.length
-                ? items.map((it, i) => el('li', { key: i }, el('a', { href: '#', onClick: (e) => e.preventDefault() }, it.title)))
-                : [el('li', { key: 1 }, el('span', null, assigned ? 'Primary Menu (assigned)' : 'Primary Menu (not assigned)'))];
+            const text = data
+                ? (assigned ? ('Menu: ' + (name || 'Primary Menu')) : 'No menu assigned (Primary Menu)')
+                : 'Menu: loading…';
 
-            return el('div', { className: 'mt-primary-menu' }, [
-                el('button', { className: 'mt-hamburger', type: 'button' }, '☰'),
-                el('ul', { className: 'menu' }, list),
+            return el('div', { className: 'mt-primary-menu', style: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' } }, [
+                el('button', { className: 'mt-hamburger', type: 'button', disabled: true, style: { opacity: 0.6 } }, '☰'),
+                el('div', { style: labelStyle() }, text)
             ]);
         },
         save: function () { return null; }

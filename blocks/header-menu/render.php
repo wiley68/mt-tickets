@@ -7,6 +7,7 @@ $menu = wp_nav_menu(array(
 	'fallback_cb'    => false,
 	'echo'           => false,
 	'depth'          => 2,
+	'menu_class'     => 'mt-primary-menu__list',
 ));
 
 if (!$menu) {

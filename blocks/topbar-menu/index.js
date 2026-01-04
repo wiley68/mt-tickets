@@ -8,6 +8,20 @@ wp.domReady(function () {
             .catch(function () { return null; });
     }
 
+    function labelStyle() {
+        return {
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '8px 10px',
+            border: '1px dashed #cbd5e1',
+            borderRadius: '10px',
+            fontSize: '13px',
+            lineHeight: '1',
+            opacity: 0.9,
+            maxWidth: '100%'
+        };
+    }
+
     wp.blocks.registerBlockType('mt-tickets/topbar-menu', {
         edit: function () {
             const [data, setData] = useState(null);
@@ -19,30 +33,14 @@ wp.domReady(function () {
             }, []);
 
             const assigned = !!(data && data.menu && data.menu.assigned);
-            const items = (data && data.menu && Array.isArray(data.menu.items)) ? data.menu.items : [];
+            const name = (data && data.menu && data.menu.name) ? data.menu.name : '';
 
-            // If assigned and has items: show them; else show assigned label + generic items;
-            let listItems;
-            if (assigned) {
-                if (items.length) {
-                    listItems = items.map(function (it, idx) {
-                        return el('li', { key: idx }, el('a', { href: '#', onClick: function (e) { e.preventDefault(); } }, it.title));
-                    });
-                } else {
-                    listItems = [
-                        el('li', { key: 1 }, el('span', null, 'Top Bar Menu (assigned)'))
-                    ];
-                }
-            } else {
-                listItems = [
-                    el('li', { key: 1 }, el('a', { href: '#', onClick: function (e) { e.preventDefault(); } }, 'Help')),
-                    el('li', { key: 2 }, el('a', { href: '#', onClick: function (e) { e.preventDefault(); } }, 'FAQ')),
-                    el('li', { key: 3 }, el('a', { href: '#', onClick: function (e) { e.preventDefault(); } }, 'Contacts'))
-                ];
-            }
+            const text = data
+                ? (assigned ? ('Menu: ' + (name || 'Top Bar Menu')) : 'No menu assigned (Top Bar Menu)')
+                : 'Menu: loading…';
 
-            return el('nav', { className: 'mt-topbar-menu', 'aria-label': 'Top bar menu (preview)' },
-                el('ul', { className: 'menu' }, listItems)
+            return el('div', { className: 'mt-topbar-menu' },
+                el('div', { style: labelStyle() }, text)
             );
         },
         save: function () { return null; }
