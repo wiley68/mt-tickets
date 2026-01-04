@@ -80,14 +80,7 @@ function mt_tickets_svg_cart()
 		<?php
 		if ($has_woo) {
 			echo '<div class="mt-mini-cart">';
-			if (function_exists('woocommerce_mini_cart')) {
-				ob_start();
-				woocommerce_mini_cart();
-				echo ob_get_clean();
-			} else {
-				// fallback (ако някога функцията липсва)
-				echo do_shortcode('[woocommerce_mini_cart]');
-			}
+			// mini cart content
 			echo '</div>';
 		} else {
 			echo '<p>' . esc_html__('Mini cart placeholder (will be provided by the ticketing/commerce plugin).', 'mt-tickets') . '</p>';
