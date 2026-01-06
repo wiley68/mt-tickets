@@ -8,10 +8,11 @@ $menu = wp_nav_menu(array(
 	'echo'           => false,
 	'depth'          => 2,
 	'menu_class'     => 'mt-primary-menu__list',
+	'items_wrap'     => '<ul class="mt-primary-menu__list">%3$s</ul>',
 ));
 
 if (!$menu) {
-	$menu = '<ul class="menu"><li><a href="#">Routes</a></li><li><a href="#">Carriers</a></li><li><a href="#">Help</a></li></ul>';
+	$menu = '<ul class="mt-primary-menu__list"><li><a href="#">Routes</a></li><li><a href="#">Carriers</a></li><li><a href="#">Help</a></li></ul>';
 }
 
 $attrs = get_block_wrapper_attributes(array('class' => 'mt-primary-menu'));
