@@ -2,6 +2,20 @@
     function qs(sel, root) { return (root || document).querySelector(sel); }
     function qsa(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
 
+    // Helper function to check if we're on cart page
+    function isOnCartPage() {
+        return window.location.pathname.includes('/cart') ||
+            qs('.woocommerce-cart') !== null ||
+            qs('.wc-block-cart') !== null ||
+            qs('.wp-block-woocommerce-cart') !== null;
+    }
+
+    // Helper function to check if mini cart panel is open
+    function isMiniCartOpen() {
+        const panel = qs('#mt-panel-cart');
+        return panel && panel.classList.contains('is-open');
+    }
+
     function openPanel(id) {
         const panel = qs(id);
         if (!panel) return;
@@ -128,6 +142,12 @@
 
                     // Recalculate totals and counts
                     recalcMiniCartCounts();
+
+                    // If on cart page and mini cart is open, reload page to refresh cart page
+                    if (isOnCartPage() && isMiniCartOpen()) {
+                        window.location.reload();
+                        return; // Exit early, page will reload
+                    }
 
                     // Refresh mini cart to sync with server
                     refreshMiniCart(false);
@@ -309,6 +329,12 @@
                 );
                 doRemoveDomUpdate();
 
+                // If on cart page and mini cart is open, reload page to refresh cart page
+                if (isOnCartPage() && isMiniCartOpen()) {
+                    window.location.reload();
+                    return; // Exit early, page will reload
+                }
+
                 // Refresh mini cart to sync with server
                 refreshMiniCart(false);
             } catch (err) {
@@ -468,7 +494,7 @@
     // Using both jQuery (if available) and native events
     if (typeof jQuery !== 'undefined') {
         jQuery(document.body).on('added_to_cart', function (event, fragments, cart_hash, $button) {
-            // Refresh mini cart when product is added
+            // Refresh mini cart when product is added (from product page or shop page)
             refreshMiniCart(true); // Open panel when adding product
         });
 
@@ -487,6 +513,56 @@
             refreshMiniCart(false);
         });
     }
+
+    // Also listen for native "Add to cart" button clicks (for shop/archive pages)
+    // This ensures we catch the event even if jQuery events don't fire
+    document.addEventListener('click', function (e) {
+        // Check if clicked element is an "Add to cart" button
+        const addToCartBtn = e.target.closest('a.add_to_cart_button') ||
+            e.target.closest('button.add_to_cart_button') ||
+            e.target.closest('a[data-product_id]') ||
+            e.target.closest('button[data-product_id]') ||
+            e.target.closest('.wp-block-button__link[data-product_id]') ||
+            e.target.closest('.wc-block-grid__product-add-to-cart-button') ||
+            e.target.closest('[class*="add-to-cart"]');
+
+        if (addToCartBtn) {
+            // Store initial cart count
+            const initialCartCount = lastCartCount !== null ? lastCartCount :
+                (qs('.mt-cart-badge') ? parseInt(qs('.mt-cart-badge').textContent) || 0 : 0);
+
+            // Wait for WooCommerce AJAX to complete
+            // Check multiple times to catch the update
+            let checkCount = 0;
+            const maxChecks = 20; // Check for 2 seconds (20 * 100ms)
+
+            const checkInterval = setInterval(() => {
+                checkCount++;
+
+                // Check if button state changed (AJAX completed)
+                const isAdded = addToCartBtn.classList.contains('added');
+                const isNotLoading = !addToCartBtn.classList.contains('loading');
+
+                // Also check if cart count changed
+                const currentBadge = qs('.mt-cart-badge');
+                const currentCartCount = currentBadge ? parseInt(currentBadge.textContent) || 0 : 0;
+                const cartCountChanged = currentCartCount > initialCartCount;
+
+                if ((isAdded || (isNotLoading && cartCountChanged)) || checkCount >= maxChecks) {
+                    clearInterval(checkInterval);
+                    // Small delay to ensure cart is updated on server
+                    setTimeout(() => {
+                        refreshMiniCart(true); // Open panel when adding product
+                    }, 200);
+                }
+            }, 100);
+
+            // Clear interval after max time to avoid infinite loop
+            setTimeout(() => {
+                clearInterval(checkInterval);
+            }, 3000);
+        }
+    }, true); // Use capture phase to catch earlier
 
     // Track cart state for comparison
     let lastCartCount = null;
