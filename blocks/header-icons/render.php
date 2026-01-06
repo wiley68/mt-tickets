@@ -105,6 +105,13 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 				<?php
 				if ($has_woo && $cart_count > 0) {
 					$cart = WC()->cart;
+					$cart_totals = $cart->get_totals();
+					$cart_total_num = isset($cart_totals['total']) ? (float)$cart_totals['total'] : 0;
+					$currency_symbol = get_woocommerce_currency_symbol();
+					$currency_pos    = get_option('woocommerce_currency_pos', 'left');
+					$decimals        = wc_get_price_decimals();
+					$decimal_sep     = wc_get_price_decimal_separator();
+					$thousand_sep    = wc_get_price_thousand_separator();
 					$cart_items = $cart->get_cart();
 					
 					foreach ($cart_items as $cart_item_key => $cart_item) {
@@ -115,9 +122,10 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 						$product_name = $_product->get_name();
 						$product_price = $_product->get_price_html();
 						$product_image = $_product->get_image(array(120, 120));
+						$line_total = isset($cart_item['line_total']) ? (float)$cart_item['line_total'] : 0;
 						
 						?>
-						<div class="mt-mini-cart__item">
+						<div class="mt-mini-cart__item" data-line-total="<?php echo esc_attr($line_total); ?>">
 							<div class="mt-mini-cart__item-image">
 								<?php echo $product_image; ?>
 							</div>
@@ -153,6 +161,18 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 			<!-- Footer -->
 			<?php if ($has_woo && $cart_count > 0) : ?>
 			<div class="mt-mini-cart__footer">
+				<div class="mt-mini-cart__total">
+					<span class="mt-mini-cart__total-label"><?php echo esc_html__('Total in cart:', 'mt-tickets'); ?></span>
+					<span
+						class="mt-mini-cart__total-value"
+						data-total="<?php echo esc_attr($cart_total_num); ?>"
+						data-currency-symbol="<?php echo esc_attr($currency_symbol); ?>"
+						data-currency-position="<?php echo esc_attr($currency_pos); ?>"
+						data-decimals="<?php echo esc_attr($decimals); ?>"
+						data-decimal-sep="<?php echo esc_attr($decimal_sep); ?>"
+						data-thousand-sep="<?php echo esc_attr($thousand_sep); ?>"
+					><?php echo wp_kses_post(wc_price($cart_total_num)); ?></span>
+				</div>
 				<a href="<?php echo esc_url(wc_get_cart_url()); ?>" class="mt-mini-cart__btn mt-mini-cart__btn--secondary">
 					<?php echo esc_html__('View cart', 'mt-tickets'); ?>
 				</a>

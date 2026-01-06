@@ -784,6 +784,26 @@ html.mt-panel-open {
     background: var(--wp--preset--color--background, #FFFFFF);
 }
 
+.mt-mini-cart__total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--wp--preset--color--surface, #F8FAFC);
+    border-bottom: 1px solid var(--wp--preset--color--border, #E2E8F0);
+    border-radius: 8px;
+}
+
+.mt-mini-cart__total-label {
+    font-weight: 600;
+    color: var(--wp--preset--color--text, #0F172A);
+}
+
+.mt-mini-cart__total-value {
+    font-weight: 700;
+    color: var(--wp--preset--color--text, #0F172A);
+}
+
 .mt-mini-cart__btn {
     display: block;
     width: 100%;

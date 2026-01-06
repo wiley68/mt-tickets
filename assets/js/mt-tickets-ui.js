@@ -96,7 +96,59 @@
         }
     });
 
-    // Helpers to recompute mini cart counts and UI without reload
+    // Helpers: format price using stored meta
+    function formatPrice(amount, meta) {
+        const {
+            currencySymbol = '',
+            currencyPosition = 'left',
+            decimals = 2,
+            decimalSep = '.',
+            thousandSep = ',',
+        } = meta || {};
+
+        const fixed = Number(amount || 0).toFixed(Number(decimals));
+        const parts = fixed.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+        const number = parts.join(decimalSep);
+
+        switch (currencyPosition) {
+            case 'right':
+                return `${number}${currencySymbol}`;
+            case 'left_space':
+                return `${currencySymbol} ${number}`;
+            case 'right_space':
+                return `${number} ${currencySymbol}`;
+            case 'left':
+            default:
+                return `${currencySymbol}${number}`;
+        }
+    }
+
+    function recalcMiniCartTotals() {
+        const totalEl = qs('.mt-mini-cart__total-value');
+        if (!totalEl) return 0;
+
+        const items = qsa('.mt-mini-cart__item[data-line-total]');
+        let total = 0;
+        items.forEach((item) => {
+            const v = parseFloat(item.getAttribute('data-line-total'));
+            if (!isNaN(v)) total += v;
+        });
+
+        const meta = {
+            currencySymbol: totalEl.dataset.currencySymbol || '',
+            currencyPosition: totalEl.dataset.currencyPosition || 'left',
+            decimals: totalEl.dataset.decimals || 2,
+            decimalSep: totalEl.dataset.decimalSep || '.',
+            thousandSep: totalEl.dataset.thousandSep || ',',
+        };
+
+        totalEl.textContent = formatPrice(total, meta);
+        totalEl.setAttribute('data-total', total);
+        return total;
+    }
+
+    // Helpers to recompute mini cart counts/totals and UI without reload
     function recalcMiniCartCounts() {
         const qtyInputs = qsa('.mt-mini-cart__qty-input');
         let total = 0;
@@ -127,7 +179,11 @@
 
         const footer = qs('.mt-mini-cart__footer');
         const body = qs('.mt-mini-cart__body');
-        if (total === 0) {
+
+        // Recalculate totals from remaining items
+        const amountTotal = recalcMiniCartTotals();
+
+        if (total === 0 || amountTotal === 0) {
             if (body) {
                 body.innerHTML = '<div class="mt-mini-cart__empty">Your cart is empty.</div>';
             }
