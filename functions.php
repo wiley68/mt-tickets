@@ -149,6 +149,35 @@ add_action('admin_init', function () {
 		'mt-tickets-settings',
 		'mt_tickets_header_section'
 	);
+
+	add_settings_field(
+		'mt_tickets_primary_menu_hint',
+		__('Primary Menu', 'mt-tickets'),
+		function () {
+			$menus_url     = admin_url('nav-menus.php');
+			$locations_url = admin_url('nav-menus.php?action=locations');
+
+			$info = mt_tickets_get_primary_menu_info();
+
+			echo '<p class="description">';
+			echo esc_html__('The header menu is a WordPress menu assigned to the "Primary Menu" location.', 'mt-tickets');
+			echo '</p>';
+
+			if ($info['assigned']) {
+				$name = $info['menu_name'] ?: __('(assigned)', 'mt-tickets');
+				echo '<p><strong>' . esc_html__('Current:', 'mt-tickets') . '</strong> ' . esc_html($name) . '</p>';
+			} else {
+				echo '<p style="color:#b32d2e;"><strong>' . esc_html__('Current:', 'mt-tickets') . '</strong> ' . esc_html__('Not assigned', 'mt-tickets') . '</p>';
+			}
+
+			echo '<p>';
+			echo '<a class="button button-secondary" href="' . esc_url($menus_url) . '">' . esc_html__('Manage Menus', 'mt-tickets') . '</a> ';
+			echo '<a class="button button-secondary" style="margin-left:6px" href="' . esc_url($locations_url) . '">' . esc_html__('Menu Locations', 'mt-tickets') . '</a>';
+			echo '</p>';
+		},
+		'mt-tickets-settings',
+		'mt_tickets_header_section'
+	);
 });
 
 function mt_tickets_render_settings_page()
@@ -178,6 +207,32 @@ function mt_tickets_get_topbar_menu_info()
 	if ($assigned) {
 		$locations = get_nav_menu_locations();
 		$menu_id = (int) ($locations['mt_tickets_topbar'] ?? 0);
+
+		if ($menu_id) {
+			$term = get_term($menu_id, 'nav_menu');
+			if ($term && !is_wp_error($term)) {
+				$menu_name = (string) $term->name;
+			}
+		}
+	}
+
+	return array(
+		'assigned'  => $assigned,
+		'menu_id'   => $menu_id,
+		'menu_name' => $menu_name,
+	);
+}
+
+function mt_tickets_get_primary_menu_info()
+{
+	$assigned = has_nav_menu('mt_tickets_primary');
+
+	$menu_id = 0;
+	$menu_name = '';
+
+	if ($assigned) {
+		$locations = get_nav_menu_locations();
+		$menu_id = (int) ($locations['mt_tickets_primary'] ?? 0);
 
 		if ($menu_id) {
 			$term = get_term($menu_id, 'nav_menu');
