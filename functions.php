@@ -55,6 +55,20 @@ add_action('admin_init', function () {
 		'default'           => 0,
 	));
 
+	// Header user icon (select)
+	register_setting('mt_tickets_settings', 'mt_tickets_header_user_icon', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_key',
+		'default'           => 'user',
+	));
+
+	// Header cart icon (select)
+	register_setting('mt_tickets_settings', 'mt_tickets_header_cart_icon', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_key',
+		'default'           => 'cart',
+	));
+
 	add_settings_section(
 		'mt_tickets_header_section',
 		__('Header', 'mt-tickets'),
@@ -174,6 +188,60 @@ add_action('admin_init', function () {
 			echo '<a class="button button-secondary" href="' . esc_url($menus_url) . '">' . esc_html__('Manage Menus', 'mt-tickets') . '</a> ';
 			echo '<a class="button button-secondary" style="margin-left:6px" href="' . esc_url($locations_url) . '">' . esc_html__('Menu Locations', 'mt-tickets') . '</a>';
 			echo '</p>';
+		},
+		'mt-tickets-settings',
+		'mt_tickets_header_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_header_user_icon',
+		__('Header User Icon', 'mt-tickets'),
+		function () {
+			$value = get_option('mt_tickets_header_user_icon', 'user');
+			$options = array(
+				'user' => __('User', 'mt-tickets'),
+				'user-circle' => __('User Circle', 'mt-tickets'),
+				'account' => __('Account', 'mt-tickets'),
+			);
+
+			echo '<select name="mt_tickets_header_user_icon">';
+			foreach ($options as $k => $label) {
+				printf(
+					'<option value="%s"%s>%s</option>',
+					esc_attr($k),
+					selected($value, $k, false),
+					esc_html($label)
+				);
+			}
+			echo '</select>';
+			echo '<p class="description">' . esc_html__('Choose the icon shown for the user/account button in the header.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-settings',
+		'mt_tickets_header_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_header_cart_icon',
+		__('Header Cart Icon', 'mt-tickets'),
+		function () {
+			$value = get_option('mt_tickets_header_cart_icon', 'cart');
+			$options = array(
+				'cart' => __('Cart', 'mt-tickets'),
+				'shopping-bag' => __('Shopping Bag', 'mt-tickets'),
+				'basket' => __('Basket', 'mt-tickets'),
+			);
+
+			echo '<select name="mt_tickets_header_cart_icon">';
+			foreach ($options as $k => $label) {
+				printf(
+					'<option value="%s"%s>%s</option>',
+					esc_attr($k),
+					selected($value, $k, false),
+					esc_html($label)
+				);
+			}
+			echo '</select>';
+			echo '<p class="description">' . esc_html__('Choose the icon shown for the cart button in the header.', 'mt-tickets') . '</p>';
 		},
 		'mt-tickets-settings',
 		'mt_tickets_header_section'
