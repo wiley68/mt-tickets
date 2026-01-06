@@ -198,9 +198,9 @@ Text Domain: mt-tickets
     height: 18px;
     padding: 0 5px;
     border-radius: 999px;
-    border: 1px solid var(--wp--preset--color--border);
-    background: #fff;
-    color: var(--wp--preset--color--text);
+    border: 1px solid var(--wp--preset--color--accent-light);
+    background: var(--wp--preset--color--accent-light);
+    color: #fff;
     font-size: 12px;
     line-height: 18px;
     text-align: center;
