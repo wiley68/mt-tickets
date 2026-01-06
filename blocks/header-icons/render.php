@@ -122,7 +122,11 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 								<?php echo $product_image; ?>
 							</div>
 							<div class="mt-mini-cart__item-details">
-								<div class="mt-mini-cart__item-name"><?php echo esc_html($product_name); ?></div>
+								<div class="mt-mini-cart__item-name">
+									<a href="<?php echo esc_url($product_permalink); ?>">
+										<?php echo esc_html($product_name); ?>
+									</a>
+								</div>
 								<div class="mt-mini-cart__item-price"><?php echo $product_price; ?></div>
 								<div class="mt-mini-cart__item-actions">
 									<div class="mt-mini-cart__quantity">
