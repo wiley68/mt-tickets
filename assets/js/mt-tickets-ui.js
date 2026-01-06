@@ -5,10 +5,10 @@
     function openPanel(id) {
         const panel = qs(id);
         if (!panel) return;
-        
+
         // Force reflow to ensure initial state is applied
         panel.offsetHeight;
-        
+
         // Add classes to trigger animation
         panel.classList.add('is-open');
         document.documentElement.classList.add('mt-panel-open');
@@ -16,13 +16,13 @@
 
     function closePanels() {
         const openPanels = qsa('.mt-panel.is-open');
-        
+
         if (openPanels.length === 0) return;
-        
+
         // Remove classes to trigger closing animation
         openPanels.forEach(p => p.classList.remove('is-open'));
         document.documentElement.classList.remove('mt-panel-open');
-        
+
         // Wait for animation to complete before hiding
         setTimeout(() => {
             openPanels.forEach(p => {
@@ -56,20 +56,25 @@
         if (e.key === 'Escape') closePanels();
     });
 
-    // Mini Cart Quantity Controls
-    document.addEventListener('click', function (e) {
+    // Mini Cart Quantity Controls (AJAX, no reload)
+    document.addEventListener('click', async function (e) {
         const qtyBtn = e.target.closest('.mt-mini-cart__qty-btn');
         if (!qtyBtn) return;
 
         e.preventDefault();
+
+        // Prevent multiple clicks
+        if (qtyBtn.classList.contains('is-loading')) return;
+
         const cartItemKey = qtyBtn.getAttribute('data-cart-item-key');
         const action = qtyBtn.getAttribute('data-action');
         const input = qs(`.mt-mini-cart__qty-input[data-cart-item-key="${cartItemKey}"]`);
-        
+        const itemEl = qtyBtn.closest('.mt-mini-cart__item');
+
         if (!input || !cartItemKey) return;
 
         let currentQty = parseInt(input.value) || 1;
-        
+
         if (action === 'increase') {
             currentQty += 1;
         } else if (action === 'decrease' && currentQty > 1) {
@@ -78,21 +83,78 @@
             return; // Don't allow quantity below 1
         }
 
+        // Add loading state
+        if (itemEl) itemEl.classList.add('is-updating');
+        qtyBtn.classList.add('is-loading');
+        qtyBtn.disabled = true;
+        input.disabled = true;
+
+        const doUpdateDom = () => {
+            if (itemEl) itemEl.classList.remove('is-updating');
+            qtyBtn.classList.remove('is-loading');
+            qtyBtn.disabled = false;
+            input.disabled = false;
+            recalcMiniCartCounts();
+        };
+
         // Update WooCommerce cart via AJAX
-        if (typeof wc_add_to_cart_params !== 'undefined') {
-            fetch(wc_add_to_cart_params.wc_ajax_url.toString().replace('%%endpoint%%', 'update_cart'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    cart_item_key: cartItemKey,
-                    quantity: currentQty
-                })
-            }).then(() => {
-                // Reload page to update cart
-                window.location.reload();
-            });
+        if (typeof mtTicketsCart !== 'undefined' && mtTicketsCart.ajax_url) {
+            try {
+                const response = await fetch(mtTicketsCart.ajax_url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'mt_update_cart_quantity',
+                        nonce: mtTicketsCart.nonce,
+                        cart_item_key: cartItemKey,
+                        quantity: currentQty
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update input value
+                    input.value = currentQty;
+
+                    // Update line total: new quantity * unit price
+                    if (itemEl) {
+                        const unitPrice = parseFloat(itemEl.getAttribute('data-unit-price')) || 0;
+                        const newLineTotal = currentQty * unitPrice;
+                        itemEl.setAttribute('data-line-total', newLineTotal);
+                    }
+
+                    // Recalculate totals and counts
+                    recalcMiniCartCounts();
+                } else {
+                    // Revert on error
+                    console.error('Failed to update cart quantity:', data.data?.message || 'Unknown error');
+                    input.value = parseInt(input.value) || 1;
+                }
+
+                doUpdateDom();
+            } catch (err) {
+                console.error('Failed to update cart quantity', err);
+                // Revert on error
+                input.value = parseInt(input.value) || 1;
+                doUpdateDom();
+            }
+        } else {
+            // Fallback: just update DOM without AJAX
+            input.value = currentQty;
+
+            // Update line total: new quantity * unit price
+            if (itemEl) {
+                const unitPrice = parseFloat(itemEl.getAttribute('data-unit-price')) || 0;
+                const newLineTotal = currentQty * unitPrice;
+                itemEl.setAttribute('data-line-total', newLineTotal);
+            }
+
+            setTimeout(() => {
+                doUpdateDom();
+            }, 300);
         }
     });
 
@@ -199,7 +261,7 @@
         if (!removeBtn) return;
 
         e.preventDefault();
-        
+
         // Prevent multiple clicks
         if (removeBtn.classList.contains('is-loading')) return;
 

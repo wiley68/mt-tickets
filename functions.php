@@ -375,7 +375,72 @@ add_action('wp_enqueue_scripts', function () {
 		wp_get_theme()->get('Version'),
 		true
 	);
+
+	// Localize script for AJAX
+	if (class_exists('WooCommerce')) {
+		wp_localize_script('mt-tickets-ui', 'mtTicketsCart', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'nonce'    => wp_create_nonce('mt_tickets_cart_nonce'),
+		));
+	}
 });
+
+/**
+ * AJAX handler for updating cart item quantity
+ */
+add_action('wp_ajax_mt_update_cart_quantity', 'mt_update_cart_quantity');
+add_action('wp_ajax_nopriv_mt_update_cart_quantity', 'mt_update_cart_quantity');
+
+function mt_update_cart_quantity()
+{
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mt_tickets_cart_nonce')) {
+		wp_send_json_error(array('message' => __('Security check failed.', 'mt-tickets')));
+		return;
+	}
+
+	// Check if WooCommerce is active
+	if (!class_exists('WooCommerce') || !function_exists('WC')) {
+		wp_send_json_error(array('message' => __('WooCommerce is not active.', 'mt-tickets')));
+		return;
+	}
+
+	$cart = WC()->cart;
+	if (!$cart) {
+		wp_send_json_error(array('message' => __('Cart not available.', 'mt-tickets')));
+		return;
+	}
+
+	// Get parameters
+	$cart_item_key = isset($_POST['cart_item_key']) ? sanitize_text_field($_POST['cart_item_key']) : '';
+	$quantity      = isset($_POST['quantity']) ? absint($_POST['quantity']) : 0;
+
+	if (empty($cart_item_key)) {
+		wp_send_json_error(array('message' => __('Cart item key is required.', 'mt-tickets')));
+		return;
+	}
+
+	if ($quantity < 1) {
+		wp_send_json_error(array('message' => __('Quantity must be at least 1.', 'mt-tickets')));
+		return;
+	}
+
+	// Update cart item quantity
+	$updated = $cart->set_quantity($cart_item_key, $quantity);
+
+	if ($updated) {
+		// Calculate totals
+		$cart->calculate_totals();
+
+		wp_send_json_success(array(
+			'cart_total' => $cart->get_cart_total(),
+			'cart_count' => $cart->get_cart_contents_count(),
+			'cart_subtotal' => $cart->get_subtotal(),
+		));
+	} else {
+		wp_send_json_error(array('message' => __('Failed to update cart item.', 'mt-tickets')));
+	}
+}
 
 /**
  * Register a menu location for the top bar (right side).

@@ -113,7 +113,7 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 					$decimal_sep     = wc_get_price_decimal_separator();
 					$thousand_sep    = wc_get_price_thousand_separator();
 					$cart_items = $cart->get_cart();
-					
+
 					foreach ($cart_items as $cart_item_key => $cart_item) {
 						$_product = $cart_item['data'];
 						$product_id = $cart_item['product_id'];
@@ -123,9 +123,10 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 						$product_price = $_product->get_price_html();
 						$product_image = $_product->get_image(array(120, 120));
 						$line_total = isset($cart_item['line_total']) ? (float)$cart_item['line_total'] : 0;
-						
-						?>
-						<div class="mt-mini-cart__item" data-line-total="<?php echo esc_attr($line_total); ?>">
+						$unit_price = $quantity > 0 ? $line_total / $quantity : 0;
+
+				?>
+						<div class="mt-mini-cart__item" data-line-total="<?php echo esc_attr($line_total); ?>" data-unit-price="<?php echo esc_attr($unit_price); ?>">
 							<div class="mt-mini-cart__item-image">
 								<?php echo $product_image; ?>
 							</div>
@@ -148,7 +149,7 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 								</div>
 							</div>
 						</div>
-						<?php
+				<?php
 					}
 				} elseif ($has_woo && $cart_count === 0) {
 					echo '<div class="mt-mini-cart__empty">' . esc_html__('Your cart is empty.', 'mt-tickets') . '</div>';
@@ -160,26 +161,25 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 
 			<!-- Footer -->
 			<?php if ($has_woo && $cart_count > 0) : ?>
-			<div class="mt-mini-cart__footer">
-				<div class="mt-mini-cart__total">
-					<span class="mt-mini-cart__total-label"><?php echo esc_html__('Total in cart:', 'mt-tickets'); ?></span>
-					<span
-						class="mt-mini-cart__total-value"
-						data-total="<?php echo esc_attr($cart_total_num); ?>"
-						data-currency-symbol="<?php echo esc_attr($currency_symbol); ?>"
-						data-currency-position="<?php echo esc_attr($currency_pos); ?>"
-						data-decimals="<?php echo esc_attr($decimals); ?>"
-						data-decimal-sep="<?php echo esc_attr($decimal_sep); ?>"
-						data-thousand-sep="<?php echo esc_attr($thousand_sep); ?>"
-					><?php echo wp_kses_post(wc_price($cart_total_num)); ?></span>
+				<div class="mt-mini-cart__footer">
+					<div class="mt-mini-cart__total">
+						<span class="mt-mini-cart__total-label"><?php echo esc_html__('Total in cart:', 'mt-tickets'); ?></span>
+						<span
+							class="mt-mini-cart__total-value"
+							data-total="<?php echo esc_attr($cart_total_num); ?>"
+							data-currency-symbol="<?php echo esc_attr($currency_symbol); ?>"
+							data-currency-position="<?php echo esc_attr($currency_pos); ?>"
+							data-decimals="<?php echo esc_attr($decimals); ?>"
+							data-decimal-sep="<?php echo esc_attr($decimal_sep); ?>"
+							data-thousand-sep="<?php echo esc_attr($thousand_sep); ?>"><?php echo wp_kses_post(wc_price($cart_total_num)); ?></span>
+					</div>
+					<a href="<?php echo esc_url(wc_get_cart_url()); ?>" class="mt-mini-cart__btn mt-mini-cart__btn--secondary">
+						<?php echo esc_html__('View cart', 'mt-tickets'); ?>
+					</a>
+					<a href="<?php echo esc_url(wc_get_checkout_url()); ?>" class="mt-mini-cart__btn mt-mini-cart__btn--primary">
+						<?php echo esc_html__('Checkout', 'mt-tickets'); ?>
+					</a>
 				</div>
-				<a href="<?php echo esc_url(wc_get_cart_url()); ?>" class="mt-mini-cart__btn mt-mini-cart__btn--secondary">
-					<?php echo esc_html__('View cart', 'mt-tickets'); ?>
-				</a>
-				<a href="<?php echo esc_url(wc_get_checkout_url()); ?>" class="mt-mini-cart__btn mt-mini-cart__btn--primary">
-					<?php echo esc_html__('Checkout', 'mt-tickets'); ?>
-				</a>
-			</div>
 			<?php endif; ?>
 		</div>
 	</div>
