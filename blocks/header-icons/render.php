@@ -50,11 +50,11 @@ $user_icon_svg = mt_tickets_svg_user($user_icon);
 $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 ?>
 <div <?php echo $attrs; ?>>
-	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-account" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>">
+	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-account" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>" data-tooltip="<?php echo esc_attr__('Open account panel to sign in or manage your account', 'mt-tickets'); ?>">
 		<?php echo $user_icon_svg; ?>
 	</button>
 
-	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-cart" aria-label="<?php echo esc_attr__('Cart', 'mt-tickets'); ?>">
+	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-cart" aria-label="<?php echo esc_attr__('Cart', 'mt-tickets'); ?>" data-tooltip="<?php echo esc_attr__('Open shopping cart to view your selected items', 'mt-tickets'); ?>">
 		<?php echo $cart_icon_svg; ?>
 
 		<?php if ($cart_count !== null && $cart_count > 0) : ?>
