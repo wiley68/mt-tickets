@@ -20,6 +20,11 @@
         const panel = qs(id);
         if (!panel) return;
 
+        // Don't open cart panel if we're on cart page
+        if (id === '#mt-panel-cart' && isOnCartPage()) {
+            return;
+        }
+
         // Force reflow to ensure initial state is applied
         panel.offsetHeight;
 
@@ -142,12 +147,6 @@
 
                     // Recalculate totals and counts
                     recalcMiniCartCounts();
-
-                    // If on cart page and mini cart is open, reload page to refresh cart page
-                    if (isOnCartPage() && isMiniCartOpen()) {
-                        window.location.reload();
-                        return; // Exit early, page will reload
-                    }
 
                     // Refresh mini cart to sync with server
                     refreshMiniCart(false);
@@ -328,12 +327,6 @@
                     }
                 );
                 doRemoveDomUpdate();
-
-                // If on cart page and mini cart is open, reload page to refresh cart page
-                if (isOnCartPage() && isMiniCartOpen()) {
-                    window.location.reload();
-                    return; // Exit early, page will reload
-                }
 
                 // Refresh mini cart to sync with server
                 refreshMiniCart(false);
