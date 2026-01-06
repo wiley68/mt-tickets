@@ -128,6 +128,9 @@
 
                     // Recalculate totals and counts
                     recalcMiniCartCounts();
+
+                    // Refresh mini cart to sync with server
+                    refreshMiniCart(false);
                 } else {
                     // Revert on error
                     console.error('Failed to update cart quantity:', data.data?.message || 'Unknown error');
@@ -305,6 +308,9 @@
                     }
                 );
                 doRemoveDomUpdate();
+
+                // Refresh mini cart to sync with server
+                refreshMiniCart(false);
             } catch (err) {
                 console.error('Failed to remove item from cart', err);
                 // Remove loading state on error
@@ -319,4 +325,322 @@
             }, 300);
         }
     });
+
+    // Function to refresh mini cart content
+    async function refreshMiniCart(shouldOpenPanel = false) {
+        if (typeof mtTicketsCart === 'undefined' || !mtTicketsCart.ajax_url) {
+            return;
+        }
+
+        try {
+            const response = await fetch(mtTicketsCart.ajax_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'mt_refresh_mini_cart',
+                    nonce: mtTicketsCart.nonce,
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update badge
+                const badge = qs('.mt-cart-badge');
+                if (data.data.cart_count > 0) {
+                    if (badge) {
+                        badge.textContent = data.data.cart_count;
+                        badge.style.display = '';
+                    } else {
+                        // Create badge if it doesn't exist
+                        const cartBtn = qs('[data-mt-open="#mt-panel-cart"]');
+                        if (cartBtn) {
+                            const newBadge = document.createElement('span');
+                            newBadge.className = 'mt-cart-badge';
+                            newBadge.setAttribute('aria-label', 'Cart items count');
+                            newBadge.textContent = data.data.cart_count;
+                            cartBtn.appendChild(newBadge);
+                        }
+                    }
+                } else {
+                    if (badge) {
+                        badge.style.display = 'none';
+                    }
+                }
+
+                // Update panel header count
+                const headerCount = qs('.mt-mini-cart__count');
+                if (data.data.cart_count > 0) {
+                    if (headerCount) {
+                        headerCount.textContent = `(${data.data.cart_count})`;
+                        headerCount.style.display = 'inline';
+                    } else {
+                        // Create count if it doesn't exist
+                        const headerStrong = qs('.mt-mini-cart__header strong');
+                        if (headerStrong) {
+                            const newCount = document.createElement('span');
+                            newCount.className = 'mt-mini-cart__count';
+                            newCount.textContent = `(${data.data.cart_count})`;
+                            headerStrong.appendChild(newCount);
+                        }
+                    }
+                } else {
+                    if (headerCount) {
+                        headerCount.style.display = 'none';
+                    }
+                }
+
+                // Update cart body
+                const cartBody = qs('.mt-mini-cart__body');
+                if (cartBody) {
+                    cartBody.innerHTML = data.data.cart_items_html;
+                }
+
+                // Update footer
+                const footer = qs('.mt-mini-cart__footer');
+                const totalValue = qs('.mt-mini-cart__total-value');
+
+                if (data.data.cart_count > 0) {
+                    if (footer) {
+                        footer.style.display = '';
+                    } else {
+                        // Create footer if it doesn't exist
+                        const miniCart = qs('.mt-mini-cart');
+                        if (miniCart) {
+                            const newFooter = document.createElement('div');
+                            newFooter.className = 'mt-mini-cart__footer';
+                            newFooter.innerHTML = `
+                                <div class="mt-mini-cart__total">
+                                    <span class="mt-mini-cart__total-label">Total in cart:</span>
+                                    <span class="mt-mini-cart__total-value"
+                                        data-total="${data.data.cart_total_num}"
+                                        data-currency-symbol="${data.data.currency_symbol}"
+                                        data-currency-position="${data.data.currency_position}"
+                                        data-decimals="${data.data.decimals}"
+                                        data-decimal-sep="${data.data.decimal_sep}"
+                                        data-thousand-sep="${data.data.thousand_sep}">${data.data.cart_total}</span>
+                                </div>
+                                <a href="${mtTicketsCart.cart_url}" class="mt-mini-cart__btn mt-mini-cart__btn--secondary">View cart</a>
+                                <a href="${mtTicketsCart.checkout_url}" class="mt-mini-cart__btn mt-mini-cart__btn--primary">Checkout</a>
+                            `;
+                            miniCart.appendChild(newFooter);
+                        }
+                    }
+
+                    if (totalValue) {
+                        totalValue.innerHTML = data.data.cart_total;
+                        totalValue.setAttribute('data-total', data.data.cart_total_num);
+                        totalValue.setAttribute('data-currency-symbol', data.data.currency_symbol);
+                        totalValue.setAttribute('data-currency-position', data.data.currency_position);
+                        totalValue.setAttribute('data-decimals', data.data.decimals);
+                        totalValue.setAttribute('data-decimal-sep', data.data.decimal_sep);
+                        totalValue.setAttribute('data-thousand-sep', data.data.thousand_sep);
+                    }
+                } else {
+                    if (footer) {
+                        footer.style.display = 'none';
+                    }
+                }
+
+                // Update last known state
+                lastCartCount = data.data.cart_count;
+
+                // Open panel if requested (e.g., when adding product)
+                if (shouldOpenPanel) {
+                    openPanel('#mt-panel-cart');
+                } else {
+                    // Update state even if not opening
+                    const currentState = getCurrentCartState();
+                    if (currentState) {
+                        lastCartCount = currentState.count;
+                        lastCartHash = currentState.hash;
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Failed to refresh mini cart', err);
+        }
+    }
+
+    // Listen for WooCommerce cart events
+    // Using both jQuery (if available) and native events
+    if (typeof jQuery !== 'undefined') {
+        jQuery(document.body).on('added_to_cart', function (event, fragments, cart_hash, $button) {
+            // Refresh mini cart when product is added
+            refreshMiniCart(true); // Open panel when adding product
+        });
+
+        jQuery(document.body).on('updated_wc_div', function () {
+            // Refresh mini cart when cart is updated (e.g., from cart page)
+            refreshMiniCart(false);
+        });
+
+        jQuery(document.body).on('updated_cart_totals', function () {
+            // Refresh mini cart when cart totals are updated (cart page quantity changes)
+            refreshMiniCart(false);
+        });
+
+        jQuery(document.body).on('wc_fragment_refresh', function () {
+            // Refresh mini cart on fragment refresh
+            refreshMiniCart(false);
+        });
+    }
+
+    // Track cart state for comparison
+    let lastCartCount = null;
+    let lastCartHash = null;
+
+    function getCurrentCartState() {
+        if (typeof mtTicketsCart === 'undefined') return null;
+
+        // Try to get cart count from various sources
+        const badge = qs('.mt-cart-badge');
+        const badgeCount = badge ? parseInt(badge.textContent) || 0 : 0;
+
+        return {
+            count: badgeCount,
+            hash: document.body.getAttribute('data-cart-hash') || ''
+        };
+    }
+
+    // Function to check if cart has changed
+    function checkCartChanges() {
+        const currentState = getCurrentCartState();
+
+        if (currentState && (
+            lastCartCount !== currentState.count ||
+            lastCartHash !== currentState.hash
+        )) {
+            refreshMiniCart(false);
+            lastCartCount = currentState.count;
+            lastCartHash = currentState.hash;
+        }
+    }
+
+    // Intercept WooCommerce AJAX requests
+    const originalFetch = window.fetch;
+    window.fetch = function (...args) {
+        const url = args[0];
+        if (typeof url === 'string' && (
+            url.includes('wc-ajax') ||
+            url.includes('update_cart') ||
+            url.includes('remove_from_cart') ||
+            url.includes('cart')
+        )) {
+            return originalFetch.apply(this, args).then(response => {
+                // After WooCommerce AJAX completes, refresh mini cart
+                setTimeout(() => {
+                    refreshMiniCart(false);
+                }, 500);
+                return response;
+            });
+        }
+        return originalFetch.apply(this, args);
+    };
+
+    // Also listen for native events (for cart page updates)
+    function setupCartPageListeners() {
+        // Listen for any quantity input changes (works with blocks too)
+        document.addEventListener('change', function (e) {
+            if (e.target.matches('input[type="number"].qty') ||
+                e.target.matches('input.qty') ||
+                e.target.closest('.wc-block-cart-item__quantity') ||
+                e.target.closest('.wp-block-woocommerce-cart-item')) {
+                // Wait for WooCommerce AJAX to complete
+                setTimeout(() => {
+                    refreshMiniCart(false);
+                }, 1000);
+            }
+        }, true); // Use capture phase to catch earlier
+
+        // Listen for remove buttons (works with blocks too)
+        document.addEventListener('click', function (e) {
+            if (e.target.matches('a.remove') ||
+                e.target.closest('a.remove') ||
+                e.target.matches('button[aria-label*="Remove"]') ||
+                e.target.closest('button[aria-label*="Remove"]')) {
+                // Wait for WooCommerce AJAX to complete
+                setTimeout(() => {
+                    refreshMiniCart(false);
+                }, 1000);
+            }
+        }, true);
+
+        // Use MutationObserver to watch for cart block updates
+        // Watch the entire body for cart-related changes
+        const observer = new MutationObserver(function (mutations) {
+            let shouldRefresh = false;
+
+            mutations.forEach(function (mutation) {
+                // Check if cart-related elements changed
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (node.nodeType === 1 && (
+                            node.matches && (
+                                node.matches('.wc-block-cart') ||
+                                node.matches('.wp-block-woocommerce-cart') ||
+                                node.matches('.woocommerce-cart-form') ||
+                                node.matches('[class*="cart"]')
+                            )
+                        )) {
+                            shouldRefresh = true;
+                        }
+                    });
+
+                    mutation.removedNodes.forEach(function (node) {
+                        if (node.nodeType === 1 && (
+                            node.matches && (
+                                node.matches('.wc-block-cart-item') ||
+                                node.matches('.wp-block-woocommerce-cart-item') ||
+                                node.matches('tr.cart_item')
+                            )
+                        )) {
+                            shouldRefresh = true;
+                        }
+                    });
+                }
+
+                // Check for attribute changes in quantity inputs
+                if (mutation.type === 'attributes' &&
+                    mutation.target.matches &&
+                    mutation.target.matches('input[type="number"]')) {
+                    shouldRefresh = true;
+                }
+            });
+
+            if (shouldRefresh) {
+                // Debounce to avoid too many refreshes
+                clearTimeout(window.mtCartRefreshTimeout);
+                window.mtCartRefreshTimeout = setTimeout(() => {
+                    refreshMiniCart(false);
+                }, 800);
+            }
+        });
+
+        // Observe the entire document for cart changes
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['value', 'class', 'data-cart-hash']
+        });
+
+        // Periodic check as fallback (every 2 seconds when on cart page)
+        if (window.location.pathname.includes('/cart') ||
+            qs('.wc-block-cart') ||
+            qs('.woocommerce-cart')) {
+            setInterval(() => {
+                checkCartChanges();
+            }, 2000);
+        }
+    }
+
+    // Setup listeners when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupCartPageListeners);
+    } else {
+        setupCartPageListeners();
+    }
 })();

@@ -262,7 +262,7 @@ function mt_tickets_render_settings_page()
 			?>
 		</form>
 	</div>
-<?php
+	<?php
 }
 
 function mt_tickets_get_topbar_menu_info()
@@ -381,6 +381,8 @@ add_action('wp_enqueue_scripts', function () {
 		wp_localize_script('mt-tickets-ui', 'mtTicketsCart', array(
 			'ajax_url' => admin_url('admin-ajax.php'),
 			'nonce'    => wp_create_nonce('mt_tickets_cart_nonce'),
+			'cart_url' => function_exists('wc_get_cart_url') ? wc_get_cart_url() : '',
+			'checkout_url' => function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : '',
 		));
 	}
 });
@@ -440,6 +442,99 @@ function mt_update_cart_quantity()
 	} else {
 		wp_send_json_error(array('message' => __('Failed to update cart item.', 'mt-tickets')));
 	}
+}
+
+/**
+ * AJAX handler for refreshing mini cart content
+ */
+add_action('wp_ajax_mt_refresh_mini_cart', 'mt_refresh_mini_cart');
+add_action('wp_ajax_nopriv_mt_refresh_mini_cart', 'mt_refresh_mini_cart');
+
+function mt_refresh_mini_cart()
+{
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mt_tickets_cart_nonce')) {
+		wp_send_json_error(array('message' => __('Security check failed.', 'mt-tickets')));
+		return;
+	}
+
+	// Check if WooCommerce is active
+	if (!class_exists('WooCommerce') || !function_exists('WC')) {
+		wp_send_json_error(array('message' => __('WooCommerce is not active.', 'mt-tickets')));
+		return;
+	}
+
+	$cart = WC()->cart;
+	if (!$cart) {
+		wp_send_json_error(array('message' => __('Cart not available.', 'mt-tickets')));
+		return;
+	}
+
+	$cart_count = (int) $cart->get_cart_contents_count();
+	$cart_totals = $cart->get_totals();
+	$cart_total_num = isset($cart_totals['total']) ? (float)$cart_totals['total'] : 0;
+	$currency_symbol = get_woocommerce_currency_symbol();
+	$currency_pos    = get_option('woocommerce_currency_pos', 'left');
+	$decimals        = wc_get_price_decimals();
+	$decimal_sep     = wc_get_price_decimal_separator();
+	$thousand_sep    = wc_get_price_thousand_separator();
+	$cart_items = $cart->get_cart();
+
+	// Build cart items HTML
+	ob_start();
+	if ($cart_count > 0) {
+		foreach ($cart_items as $cart_item_key => $cart_item) {
+			$_product = $cart_item['data'];
+			$product_id = $cart_item['product_id'];
+			$quantity = $cart_item['quantity'];
+			$product_permalink = $_product->get_permalink();
+			$product_name = $_product->get_name();
+			$product_price = $_product->get_price_html();
+			$product_image = $_product->get_image(array(120, 120));
+			$line_total = isset($cart_item['line_total']) ? (float)$cart_item['line_total'] : 0;
+			$unit_price = $quantity > 0 ? $line_total / $quantity : 0;
+	?>
+			<div class="mt-mini-cart__item" data-line-total="<?php echo esc_attr($line_total); ?>" data-unit-price="<?php echo esc_attr($unit_price); ?>">
+				<div class="mt-mini-cart__item-image">
+					<?php echo $product_image; ?>
+				</div>
+				<div class="mt-mini-cart__item-details">
+					<div class="mt-mini-cart__item-name">
+						<a href="<?php echo esc_url($product_permalink); ?>">
+							<?php echo esc_html($product_name); ?>
+						</a>
+					</div>
+					<div class="mt-mini-cart__item-price"><?php echo $product_price; ?></div>
+					<div class="mt-mini-cart__item-actions">
+						<div class="mt-mini-cart__quantity">
+							<button type="button" class="mt-mini-cart__qty-btn" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" data-action="decrease">−</button>
+							<input type="number" class="mt-mini-cart__qty-input" value="<?php echo esc_attr($quantity); ?>" min="1" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" readonly>
+							<button type="button" class="mt-mini-cart__qty-btn" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" data-action="increase">+</button>
+						</div>
+						<button type="button" class="mt-mini-cart__remove" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="<?php echo esc_attr__('Remove item', 'mt-tickets'); ?>">
+							<?php echo esc_html__('Remove', 'mt-tickets'); ?>
+						</button>
+					</div>
+				</div>
+			</div>
+<?php
+		}
+	} else {
+		echo '<div class="mt-mini-cart__empty">' . esc_html__('Your cart is empty.', 'mt-tickets') . '</div>';
+	}
+	$cart_items_html = ob_get_clean();
+
+	wp_send_json_success(array(
+		'cart_count' => $cart_count,
+		'cart_total' => wp_kses_post(wc_price($cart_total_num)),
+		'cart_total_num' => $cart_total_num,
+		'cart_items_html' => $cart_items_html,
+		'currency_symbol' => $currency_symbol,
+		'currency_position' => $currency_pos,
+		'decimals' => $decimals,
+		'decimal_sep' => $decimal_sep,
+		'thousand_sep' => $thousand_sep,
+	));
 }
 
 /**
