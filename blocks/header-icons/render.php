@@ -85,26 +85,78 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 </div>
 
 <!-- Cart Panel (UI placeholder / WooCommerce optional) -->
-<div class="mt-panel" id="mt-panel-cart" aria-hidden="true">
+<div class="mt-panel mt-panel--cart" id="mt-panel-cart" aria-hidden="true">
 	<div class="mt-panel__overlay"></div>
-	<div class="mt-panel__content" role="dialog" aria-label="<?php echo esc_attr__('Cart', 'mt-tickets'); ?>">
-		<div class="mt-panel__header">
-			<strong>
-				<?php echo esc_html__('Cart', 'mt-tickets'); ?>
-				<?php if ($cart_count !== null && $cart_count > 0) : ?>
-					<span class="mt-panel-counter">(<?php echo (int)$cart_count; ?>)</span>
-				<?php endif; ?>
-			</strong>
-			<button class="mt-panel__close" type="button" data-mt-close>✕</button>
+	<div class="mt-panel__content mt-panel__content--cart" role="dialog" aria-label="<?php echo esc_attr__('Cart', 'mt-tickets'); ?>">
+		<div class="mt-mini-cart">
+			<!-- Header -->
+			<div class="mt-mini-cart__header">
+				<strong>
+					<?php echo esc_html__('Your cart', 'mt-tickets'); ?>
+					<?php if ($cart_count !== null && $cart_count > 0) : ?>
+						<span class="mt-mini-cart__count">(<?php echo (int)$cart_count; ?>)</span>
+					<?php endif; ?>
+				</strong>
+				<button class="mt-panel__close" type="button" data-mt-close aria-label="<?php echo esc_attr__('Close cart', 'mt-tickets'); ?>">✕</button>
+			</div>
+
+			<!-- Body -->
+			<div class="mt-mini-cart__body">
+				<?php
+				if ($has_woo && $cart_count > 0) {
+					$cart = WC()->cart;
+					$cart_items = $cart->get_cart();
+					
+					foreach ($cart_items as $cart_item_key => $cart_item) {
+						$_product = $cart_item['data'];
+						$product_id = $cart_item['product_id'];
+						$quantity = $cart_item['quantity'];
+						$product_permalink = $_product->get_permalink();
+						$product_name = $_product->get_name();
+						$product_price = $_product->get_price_html();
+						$product_image = $_product->get_image(array(120, 120));
+						
+						?>
+						<div class="mt-mini-cart__item">
+							<div class="mt-mini-cart__item-image">
+								<?php echo $product_image; ?>
+							</div>
+							<div class="mt-mini-cart__item-details">
+								<div class="mt-mini-cart__item-name"><?php echo esc_html($product_name); ?></div>
+								<div class="mt-mini-cart__item-price"><?php echo $product_price; ?></div>
+								<div class="mt-mini-cart__item-actions">
+									<div class="mt-mini-cart__quantity">
+										<button type="button" class="mt-mini-cart__qty-btn" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" data-action="decrease">−</button>
+										<input type="number" class="mt-mini-cart__qty-input" value="<?php echo esc_attr($quantity); ?>" min="1" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" readonly>
+										<button type="button" class="mt-mini-cart__qty-btn" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" data-action="increase">+</button>
+									</div>
+									<button type="button" class="mt-mini-cart__remove" data-cart-item-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="<?php echo esc_attr__('Remove item', 'mt-tickets'); ?>">
+										<?php echo esc_html__('Remove', 'mt-tickets'); ?>
+									</button>
+								</div>
+							</div>
+						</div>
+						<?php
+					}
+				} elseif ($has_woo && $cart_count === 0) {
+					echo '<div class="mt-mini-cart__empty">' . esc_html__('Your cart is empty.', 'mt-tickets') . '</div>';
+				} else {
+					echo '<div class="mt-mini-cart__empty">' . esc_html__('Mini cart placeholder (will be provided by the ticketing/commerce plugin).', 'mt-tickets') . '</div>';
+				}
+				?>
+			</div>
+
+			<!-- Footer -->
+			<?php if ($has_woo && $cart_count > 0) : ?>
+			<div class="mt-mini-cart__footer">
+				<a href="<?php echo esc_url(wc_get_cart_url()); ?>" class="mt-mini-cart__btn mt-mini-cart__btn--secondary">
+					<?php echo esc_html__('View cart', 'mt-tickets'); ?>
+				</a>
+				<a href="<?php echo esc_url(wc_get_checkout_url()); ?>" class="mt-mini-cart__btn mt-mini-cart__btn--primary">
+					<?php echo esc_html__('Checkout', 'mt-tickets'); ?>
+				</a>
+			</div>
+			<?php endif; ?>
 		</div>
-		<?php
-		if ($has_woo) {
-			echo '<div class="mt-mini-cart">';
-			// mini cart content
-			echo '</div>';
-		} else {
-			echo '<p>' . esc_html__('Mini cart placeholder (will be provided by the ticketing/commerce plugin).', 'mt-tickets') . '</p>';
-		}
-		?>
 	</div>
 </div>
