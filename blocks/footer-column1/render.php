@@ -10,9 +10,12 @@ if (!$logo_url) {
 
 $attrs = get_block_wrapper_attributes();
 
+$default_title = 'About the Platform';
+$title = get_option('mt_tickets_footer_column1_title', $default_title);
+
 ?>
 <div <?php echo $attrs; ?>>
-	<h4><?php echo esc_html__('About the Platform', 'mt-tickets'); ?></h4>
+	<h4><?php echo esc_html($title); ?></h4>
 
 	<?php if ($logo_url) : ?>
 		<a href="<?php echo esc_url(home_url('/')); ?>" class="mt-footer-logo">
@@ -20,5 +23,9 @@ $attrs = get_block_wrapper_attributes();
 		</a>
 	<?php endif; ?>
 
-	<p><?php echo esc_html__('Ticket sales for carriers, schedules and reservations. The theme is independent of the plugin.', 'mt-tickets'); ?></p>
+	<?php
+	$default_description = 'Ticket sales for carriers, schedules and reservations. The theme is independent of the plugin.';
+	$description = get_option('mt_tickets_footer_description', $default_description);
+	?>
+	<p><?php echo esc_html($description); ?></p>
 </div>

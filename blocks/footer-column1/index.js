@@ -15,6 +15,8 @@ wp.domReady(function () {
             }, []);
 
             const logoUrl = (data && data.logo && data.logo.url) ? data.logo.url : '';
+            const title = (data && data.title) ? data.title : 'About the Platform';
+            const description = (data && data.description) ? data.description : 'Ticket sales for carriers, schedules and reservations. The theme is independent of the plugin.';
 
             return el('div', {
                 style: {
@@ -24,7 +26,7 @@ wp.domReady(function () {
                     backgroundColor: '#fff'
                 }
             },
-                el('h4', { style: { marginTop: '0', marginBottom: '12px' } }, 'About the Platform'),
+                el('h4', { style: { marginTop: '0', marginBottom: '12px' } }, title),
                 logoUrl ? el('a', {
                     href: '#',
                     onClick: (e) => e.preventDefault(),
@@ -43,7 +45,7 @@ wp.domReady(function () {
                         alt: 'Footer Logo'
                     })
                 ) : el('div', { style: { marginBottom: '12px', color: '#999' } }, 'Footer Logo'),
-                el('p', { style: { marginBottom: '0' } }, 'Ticket sales for carriers, schedules and reservations. The theme is independent of the plugin.')
+                el('p', { style: { marginBottom: '0' } }, description)
             );
         },
         save: function () { return null; }

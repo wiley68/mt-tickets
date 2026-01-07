@@ -283,6 +283,12 @@ add_action('admin_init', function () {
 	);
 
 	// Footer settings registration
+	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_column1_title', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_text_field',
+		'default'           => 'About the Platform',
+	));
+
 	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_logo_id', array(
 		'type'              => 'integer',
 		'sanitize_callback' => 'absint',
@@ -292,7 +298,7 @@ add_action('admin_init', function () {
 	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_description', array(
 		'type'              => 'string',
 		'sanitize_callback' => 'sanitize_textarea_field',
-		'default'           => '',
+		'default'           => 'Ticket sales for carriers, schedules and reservations. The theme is independent of the plugin.',
 	));
 
 	add_settings_section(
@@ -300,6 +306,19 @@ add_action('admin_init', function () {
 		__('Footer', 'mt-tickets'),
 		'__return_false',
 		'mt-tickets-footer-settings'
+	);
+
+	add_settings_field(
+		'mt_tickets_footer_column1_title',
+		__('Footer Column 1 Title', 'mt-tickets'),
+		function () {
+			$default = 'About the Platform';
+			$value = get_option('mt_tickets_footer_column1_title', $default);
+			echo '<input type="text" name="mt_tickets_footer_column1_title" value="' . esc_attr($value) . '" class="regular-text">';
+			echo '<p class="description">' . esc_html__('Title displayed at the top of the footer first column.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-footer-settings',
+		'mt_tickets_footer_section'
 	);
 
 	add_settings_field(
@@ -326,7 +345,8 @@ add_action('admin_init', function () {
 		'mt_tickets_footer_description',
 		__('Footer Description', 'mt-tickets'),
 		function () {
-			$value = get_option('mt_tickets_footer_description', '');
+			$default = 'Ticket sales for carriers, schedules and reservations. The theme is independent of the plugin.';
+			$value = get_option('mt_tickets_footer_description', $default);
 			echo '<textarea name="mt_tickets_footer_description" rows="3" class="large-text">' . esc_textarea($value) . '</textarea>';
 			echo '<p class="description">' . esc_html__('Short description text displayed below the logo in the footer first column.', 'mt-tickets') . '</p>';
 		},
@@ -522,6 +542,30 @@ add_action('init', function () {
 		}
 	}
 });
+
+/**
+ * Register block pattern categories for template parts.
+ */
+add_action('init', function () {
+	if (function_exists('register_block_pattern_category')) {
+		register_block_pattern_category('header', array(
+			'label' => __('Header', 'mt-tickets'),
+		));
+		register_block_pattern_category('footer', array(
+			'label' => __('Footer', 'mt-tickets'),
+		));
+	}
+});
+
+/**
+ * Filter template part categories in the editor.
+ */
+add_filter('wp_list_table_class_name', function ($class_name, $screen_id) {
+	if ($screen_id === 'edit-wp_template_part') {
+		// This filter helps organize template parts in the editor
+	}
+	return $class_name;
+}, 10, 2);
 
 /**
  * Block Bindings source: mt-tickets/options
@@ -965,10 +1009,18 @@ add_action('rest_api_init', function () {
 			$logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : '';
 			$placeholder = get_theme_file_uri('assets/images/logo-placeholder.svg');
 
+			$default_title = 'About the Platform';
+			$title = get_option('mt_tickets_footer_column1_title', $default_title);
+
+			$default_description = 'Ticket sales for carriers, schedules and reservations. The theme is independent of the plugin.';
+			$description = get_option('mt_tickets_footer_description', $default_description);
+
 			return array(
+				'title' => $title,
 				'logo' => array(
 					'url' => $logo_url ?: $placeholder,
 				),
+				'description' => $description,
 			);
 		},
 	));
