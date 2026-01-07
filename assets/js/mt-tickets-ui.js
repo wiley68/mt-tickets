@@ -10,6 +10,16 @@
             qs('.wp-block-woocommerce-cart') !== null;
     }
 
+    // Helper function to check if we're on WooCommerce account page
+    function isOnAccountPage() {
+        return window.location.pathname.includes('/my-account') ||
+            window.location.pathname.includes('/account') ||
+            qs('.woocommerce-account') !== null ||
+            qs('.woocommerce-MyAccount-navigation') !== null ||
+            qs('.wc-block-my-account') !== null ||
+            qs('.wp-block-woocommerce-my-account') !== null;
+    }
+
     // Helper function to check if mini cart panel is open
     function isMiniCartOpen() {
         const panel = qs('#mt-panel-cart');
@@ -31,6 +41,16 @@
         // Add classes to trigger animation
         panel.classList.add('is-open');
         document.documentElement.classList.add('mt-panel-open');
+
+        // Focus first input in account panel when opened
+        if (id === '#mt-panel-account') {
+            setTimeout(() => {
+                const firstInput = panel.querySelector('#user_login');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 300); // Wait for animation to complete
+        }
     }
 
     function closePanels() {
@@ -56,7 +76,18 @@
         const btn = e.target.closest('[data-mt-open]');
         if (btn) {
             e.preventDefault();
-            openPanel(btn.getAttribute('data-mt-open'));
+            const panelId = btn.getAttribute('data-mt-open');
+            
+            // If clicking account button and we're on account page, redirect to account URL
+            if (panelId === '#mt-panel-account' && isOnAccountPage()) {
+                const accountUrl = btn.getAttribute('data-account-url');
+                if (accountUrl) {
+                    window.location.href = accountUrl;
+                    return;
+                }
+            }
+            
+            openPanel(panelId);
             return;
         }
 
@@ -711,5 +742,123 @@
         document.addEventListener('DOMContentLoaded', setupCartPageListeners);
     } else {
         setupCartPageListeners();
+    }
+
+    // Account Panel: Switch to register view
+    document.addEventListener('click', function (e) {
+        const switchBtn = e.target.closest('.mt-mini-account__switch');
+        if (!switchBtn) return;
+
+        e.preventDefault();
+        const view = switchBtn.getAttribute('data-view');
+        const titleEl = qs('.mt-mini-account__title');
+        const bodyEl = qs('.mt-mini-account__body');
+
+        if (view === 'register' && titleEl && bodyEl) {
+            // Update title
+            titleEl.textContent = 'Create an account';
+            // Switch view (will be implemented in next step)
+            // For now, just update the title
+            switchBtn.setAttribute('data-view', 'signin');
+            switchBtn.textContent = 'Sign in';
+        } else if (view === 'signin' && titleEl && bodyEl) {
+            // Update title
+            titleEl.textContent = 'Sign in';
+            // Switch view (will be implemented in next step)
+            // For now, just update the title
+            switchBtn.setAttribute('data-view', 'register');
+            switchBtn.textContent = 'Create an account';
+        }
+    });
+
+    // Account Panel: AJAX Login
+    // Handle form submit (both button click and Enter key)
+    document.addEventListener('submit', async function (e) {
+        const form = e.target.closest('.mt-mini-account__form--signin');
+        if (!form) return;
+
+        e.preventDefault();
+
+        const loginBtn = form.querySelector('.mt-mini-account__login-btn');
+        if (!loginBtn) return;
+
+        const usernameInput = form.querySelector('#user_login');
+        const passwordInput = form.querySelector('#user_pass');
+        const rememberCheckbox = form.querySelector('#rememberme');
+        const errorEl = qs('.mt-mini-account__error');
+
+        if (!usernameInput || !passwordInput) return;
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        const remember = rememberCheckbox && rememberCheckbox.checked;
+
+        // Validate
+        if (!username || !password) {
+            showAccountError(errorEl, 'Username and password are required.');
+            return;
+        }
+
+        // Show loading state
+        loginBtn.disabled = true;
+        loginBtn.classList.add('is-loading');
+        if (errorEl) errorEl.style.display = 'none';
+
+        // Check if AJAX is available
+        if (typeof mtTicketsAccount === 'undefined' || !mtTicketsAccount.ajax_url) {
+            // Fallback to standard form submission
+            form.submit();
+            return;
+        }
+
+        try {
+            const response = await fetch(mtTicketsAccount.ajax_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'mt_account_login',
+                    nonce: mtTicketsAccount.nonce,
+                    log: username,
+                    pwd: password,
+                    rememberme: remember ? 'forever' : ''
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Login successful - reload page or redirect
+                if (data.data && data.data.redirect) {
+                    window.location.href = data.data.redirect;
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                // Show error message
+                const errorMessage = data.data && data.data.message 
+                    ? data.data.message 
+                    : 'Unknown email address. Check again or try your username.';
+                showAccountError(errorEl, errorMessage);
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('is-loading');
+            }
+        } catch (err) {
+            console.error('Login failed', err);
+            showAccountError(errorEl, 'An error occurred. Please try again.');
+            loginBtn.disabled = false;
+            loginBtn.classList.remove('is-loading');
+        }
+    });
+
+    // Helper function to show account error
+    function showAccountError(errorEl, message) {
+        if (!errorEl) return;
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+        
+        // Scroll to error if needed
+        errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 })();

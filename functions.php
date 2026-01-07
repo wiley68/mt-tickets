@@ -385,7 +385,66 @@ add_action('wp_enqueue_scripts', function () {
 			'checkout_url' => function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : '',
 		));
 	}
+
+	// Localize script for Account AJAX
+	wp_localize_script('mt-tickets-ui', 'mtTicketsAccount', array(
+		'ajax_url' => admin_url('admin-ajax.php'),
+		'nonce'    => wp_create_nonce('mt_tickets_account_nonce'),
+	));
 });
+
+/**
+ * AJAX handler for account login
+ */
+add_action('wp_ajax_mt_account_login', 'mt_account_login');
+add_action('wp_ajax_nopriv_mt_account_login', 'mt_account_login');
+
+function mt_account_login()
+{
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mt_tickets_account_nonce')) {
+		wp_send_json_error(array('message' => __('Security check failed.', 'mt-tickets')));
+		return;
+	}
+
+	// Get credentials
+	$username = isset($_POST['log']) ? sanitize_user($_POST['log']) : '';
+	$password = isset($_POST['pwd']) ? $_POST['pwd'] : '';
+	$remember = isset($_POST['rememberme']) && $_POST['rememberme'] === 'forever';
+
+	if (empty($username) || empty($password)) {
+		wp_send_json_error(array('message' => __('Username and password are required.', 'mt-tickets')));
+		return;
+	}
+
+	// Attempt login
+	$creds = array(
+		'user_login'    => $username,
+		'user_password' => $password,
+		'remember'      => $remember,
+	);
+
+	$user = wp_signon($creds, false);
+
+	if (is_wp_error($user)) {
+		// Get error message
+		$error_message = $user->get_error_message();
+		
+		// Default message if empty
+		if (empty($error_message)) {
+			$error_message = __('Unknown email address. Check again or try your username.', 'mt-tickets');
+		}
+		
+		wp_send_json_error(array('message' => $error_message));
+		return;
+	}
+
+	// Login successful
+	wp_send_json_success(array(
+		'message' => __('Login successful!', 'mt-tickets'),
+		'redirect' => function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : admin_url('profile.php'),
+	));
+}
 
 /**
  * AJAX handler for updating cart item quantity

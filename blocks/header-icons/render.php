@@ -14,6 +14,14 @@ if ($has_woo && function_exists('WC') && WC() && isset(WC()->cart) && WC()->cart
 $user_icon = get_option('mt_tickets_header_user_icon', 'user');
 $cart_icon = get_option('mt_tickets_header_cart_icon', 'cart');
 
+// Get account page URL
+$account_url = '';
+if ($has_woo && function_exists('wc_get_page_permalink')) {
+	$account_url = wc_get_page_permalink('myaccount');
+} else {
+	$account_url = admin_url('profile.php');
+}
+
 function mt_tickets_svg_user($icon)
 {
 	$common = 'width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"';
@@ -50,7 +58,7 @@ $user_icon_svg = mt_tickets_svg_user($user_icon);
 $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 ?>
 <div <?php echo $attrs; ?>>
-	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-account" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>" data-tooltip="<?php echo esc_attr__('Open account panel to sign in or manage your account', 'mt-tickets'); ?>">
+	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-account" data-account-url="<?php echo esc_url($account_url); ?>" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>" data-tooltip="<?php echo esc_attr__('Open account panel to sign in or manage your account', 'mt-tickets'); ?>">
 		<?php echo $user_icon_svg; ?>
 	</button>
 
@@ -65,22 +73,67 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 	</button>
 </div>
 
-<!-- Account Panel (UI placeholder) -->
-<div class="mt-panel" id="mt-panel-account" aria-hidden="true">
+<!-- Account Panel -->
+<div class="mt-panel mt-panel--account" id="mt-panel-account" aria-hidden="true">
 	<div class="mt-panel__overlay"></div>
-	<div class="mt-panel__content" role="dialog" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>">
-		<div class="mt-panel__header">
-			<strong><?php echo esc_html__('Sign in', 'mt-tickets'); ?></strong>
-			<button class="mt-panel__close" type="button" data-mt-close>✕</button>
+	<div class="mt-panel__content mt-panel__content--account" role="dialog" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>">
+		<div class="mt-mini-account">
+			<!-- Header -->
+			<div class="mt-mini-account__header">
+				<strong class="mt-mini-account__title"><?php echo esc_html__('Sign in', 'mt-tickets'); ?></strong>
+				<button class="mt-panel__close" type="button" data-mt-close aria-label="<?php echo esc_attr__('Close account panel', 'mt-tickets'); ?>">✕</button>
+			</div>
+
+			<!-- Body -->
+			<div class="mt-mini-account__body">
+				<?php if (!is_user_logged_in()) : ?>
+					<!-- Error message container -->
+					<div class="mt-mini-account__error" style="display: none;"></div>
+					
+					<!-- Sign in form -->
+					<form class="mt-mini-account__form mt-mini-account__form--signin" method="post">
+						<div class="mt-mini-account__form-group">
+							<input type="text" name="log" id="user_login" class="mt-mini-account__input" placeholder="<?php echo esc_attr__('Username or Email Address', 'mt-tickets'); ?>" autocomplete="username" required>
+						</div>
+						<div class="mt-mini-account__form-group">
+							<input type="password" name="pwd" id="user_pass" class="mt-mini-account__input" placeholder="<?php echo esc_attr__('Password', 'mt-tickets'); ?>" autocomplete="current-password" required>
+						</div>
+						<div class="mt-mini-account__form-row">
+							<div class="mt-mini-account__form-col">
+								<label class="mt-mini-account__checkbox-label">
+									<input type="checkbox" name="rememberme" id="rememberme" value="forever" class="mt-mini-account__checkbox">
+									<span><?php echo esc_html__('Remember me', 'mt-tickets'); ?></span>
+								</label>
+							</div>
+							<div class="mt-mini-account__form-col">
+								<?php
+								$lost_password_url = $has_woo && function_exists('wc_lostpassword_url') 
+									? wc_lostpassword_url() 
+									: wp_lostpassword_url();
+								?>
+								<a href="<?php echo esc_url($lost_password_url); ?>" class="mt-mini-account__link"><?php echo esc_html__('Forgot your password?', 'mt-tickets'); ?></a>
+							</div>
+						</div>
+						<div class="mt-mini-account__form-group">
+							<button type="submit" class="mt-mini-account__btn mt-mini-account__btn--primary mt-mini-account__login-btn">
+								<?php echo esc_html__('Log in', 'mt-tickets'); ?>
+							</button>
+						</div>
+						<div class="mt-mini-account__form-group">
+							<button type="button" class="mt-mini-account__btn mt-mini-account__btn--secondary mt-mini-account__switch" data-view="register">
+								<?php echo esc_html__('Create an account', 'mt-tickets'); ?>
+							</button>
+						</div>
+						<?php wp_nonce_field('mt_account_login', 'mt_account_login_nonce'); ?>
+					</form>
+				<?php else : ?>
+					<!-- Logged in view (will be implemented later) -->
+					<div class="mt-mini-account__logged-in">
+						<p><?php echo esc_html__('You are logged in.', 'mt-tickets'); ?></p>
+					</div>
+				<?php endif; ?>
+			</div>
 		</div>
-		<?php
-		if (is_user_logged_in()) {
-			echo '<p>' . esc_html__('You are logged in.', 'mt-tickets') . '</p>';
-		} else {
-			wp_login_form(array('echo' => true));
-			echo '<p style="margin-top:12px;"><a href="' . esc_url(wp_registration_url()) . '">' . esc_html__('Create an account', 'mt-tickets') . '</a></p>';
-		}
-		?>
 	</div>
 </div>
 
