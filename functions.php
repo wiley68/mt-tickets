@@ -26,7 +26,7 @@ add_action('after_setup_theme', 'mt_tickets_load_theme_textdomain');
 add_action('admin_menu', function () {
 	// Main menu page (parent) - Overview will be the default page
 	$parent_slug = 'mt-tickets-overview';
-	
+
 	add_menu_page(
 		__('MT Tickets', 'mt-tickets'),
 		__('MT Tickets', 'mt-tickets'),
@@ -36,7 +36,7 @@ add_action('admin_menu', function () {
 		'dashicons-admin-generic',
 		30
 	);
-	
+
 	// Overview submenu (default page)
 	add_submenu_page(
 		$parent_slug,
@@ -46,7 +46,7 @@ add_action('admin_menu', function () {
 		'mt-tickets-overview',
 		'mt_tickets_render_overview_page'
 	);
-	
+
 	// Header submenu
 	add_submenu_page(
 		$parent_slug,
@@ -56,7 +56,7 @@ add_action('admin_menu', function () {
 		'mt-tickets-settings',
 		'mt_tickets_render_header_settings_page'
 	);
-	
+
 	// Footer submenu
 	add_submenu_page(
 		$parent_slug,
@@ -281,27 +281,27 @@ add_action('admin_init', function () {
 		'mt-tickets-settings',
 		'mt_tickets_header_section'
 	);
-	
+
 	// Footer settings registration
 	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_logo_id', array(
 		'type'              => 'integer',
 		'sanitize_callback' => 'absint',
 		'default'           => 0,
 	));
-	
+
 	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_description', array(
 		'type'              => 'string',
 		'sanitize_callback' => 'sanitize_textarea_field',
 		'default'           => '',
 	));
-	
+
 	add_settings_section(
 		'mt_tickets_footer_section',
 		__('Footer', 'mt-tickets'),
 		'__return_false',
 		'mt-tickets-footer-settings'
 	);
-	
+
 	add_settings_field(
 		'mt_tickets_footer_logo_id',
 		__('Footer Logo', 'mt-tickets'),
@@ -321,7 +321,7 @@ add_action('admin_init', function () {
 		'mt-tickets-footer-settings',
 		'mt_tickets_footer_section'
 	);
-	
+
 	add_settings_field(
 		'mt_tickets_footer_description',
 		__('Footer Description', 'mt-tickets'),
@@ -338,19 +338,19 @@ add_action('admin_init', function () {
 function mt_tickets_render_overview_page()
 {
 	if (! current_user_can('manage_options')) return;
-	
+
 	$theme = wp_get_theme();
 	$theme_version = $theme->get('Version');
 	$theme_name = $theme->get('Name');
 ?>
 	<div class="wrap">
 		<h1><?php echo esc_html__('MT Tickets Theme', 'mt-tickets'); ?></h1>
-		
+
 		<div class="mt-tickets-overview" style="max-width: 1200px;">
 			<div class="mt-tickets-overview__intro" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px; margin: 20px 0;">
 				<h2 style="margin-top: 0;"><?php echo esc_html__('Welcome to MT Tickets Theme', 'mt-tickets'); ?></h2>
 				<p style="font-size: 15px; line-height: 1.6;">
-					<?php 
+					<?php
 					printf(
 						esc_html__('Thank you for using %s version %s. This theme is designed for ticket sales platforms, carriers, schedules, and reservations.', 'mt-tickets'),
 						'<strong>' . esc_html($theme_name) . '</strong>',
@@ -359,7 +359,7 @@ function mt_tickets_render_overview_page()
 					?>
 				</p>
 			</div>
-			
+
 			<div class="mt-tickets-overview__sections" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
 				<div class="mt-tickets-overview__section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px;">
 					<h3 style="margin-top: 0;"><?php echo esc_html__('Quick Links', 'mt-tickets'); ?></h3>
@@ -370,7 +370,7 @@ function mt_tickets_render_overview_page()
 						<li><a href="<?php echo esc_url(admin_url('customize.php')); ?>"><?php echo esc_html__('Customize Theme', 'mt-tickets'); ?></a></li>
 					</ul>
 				</div>
-				
+
 				<div class="mt-tickets-overview__section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px;">
 					<h3 style="margin-top: 0;"><?php echo esc_html__('Documentation', 'mt-tickets'); ?></h3>
 					<p><?php echo esc_html__('Comprehensive documentation will be available soon. Check back for detailed guides on:', 'mt-tickets'); ?></p>
@@ -384,7 +384,7 @@ function mt_tickets_render_overview_page()
 						<a href="#" class="button button-primary" target="_blank" rel="noopener"><?php echo esc_html__('View Documentation', 'mt-tickets'); ?></a>
 					</p>
 				</div>
-				
+
 				<div class="mt-tickets-overview__section" style="background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px;">
 					<h3 style="margin-top: 0;"><?php echo esc_html__('Support & Resources', 'mt-tickets'); ?></h3>
 					<p><?php echo esc_html__('Need help? Get support and find additional resources:', 'mt-tickets'); ?></p>
@@ -395,7 +395,7 @@ function mt_tickets_render_overview_page()
 					</ul>
 				</div>
 			</div>
-			
+
 			<div class="mt-tickets-overview__promo" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 30px; border-radius: 4px; margin: 20px 0;">
 				<h2 style="color: #fff; margin-top: 0;"><?php echo esc_html__('Get More Features', 'mt-tickets'); ?></h2>
 				<p style="font-size: 15px; line-height: 1.6; color: rgba(255, 255, 255, 0.9);">
@@ -405,11 +405,11 @@ function mt_tickets_render_overview_page()
 					<a href="#" class="button button-primary" target="_blank" rel="noopener" style="background: #fff; color: #667eea; border-color: #fff;"><?php echo esc_html__('Learn More', 'mt-tickets'); ?></a>
 				</p>
 			</div>
-			
+
 			<div class="mt-tickets-overview__info" style="background: #f0f0f1; padding: 15px; border-radius: 4px; margin: 20px 0;">
 				<p style="margin: 0; font-size: 13px; color: #646970;">
 					<strong><?php echo esc_html__('Theme Information:', 'mt-tickets'); ?></strong><br>
-					<?php 
+					<?php
 					printf(
 						esc_html__('Version: %s | License: %s | Author: %s', 'mt-tickets'),
 						'<strong>' . esc_html($theme_version) . '</strong>',
@@ -421,7 +421,7 @@ function mt_tickets_render_overview_page()
 			</div>
 		</div>
 	</div>
-	<?php
+<?php
 }
 
 function mt_tickets_render_header_settings_page()
@@ -438,7 +438,7 @@ function mt_tickets_render_header_settings_page()
 			?>
 		</form>
 	</div>
-	<?php
+<?php
 }
 
 function mt_tickets_render_footer_settings_page()
@@ -516,7 +516,7 @@ function mt_tickets_get_primary_menu_info()
 add_action('init', function () {
 	$base = __DIR__ . '/blocks';
 
-	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-logo') as $b) {
+	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-column1') as $b) {
 		if (is_dir($base . '/' . $b)) {
 			register_block_type($base . '/' . $b);
 		}
@@ -622,12 +622,12 @@ function mt_account_login()
 	if (is_wp_error($user)) {
 		// Get error message
 		$error_message = $user->get_error_message();
-		
+
 		// Default message if empty
 		if (empty($error_message)) {
 			$error_message = __('Unknown email address. Check again or try your username.', 'mt-tickets');
 		}
-		
+
 		wp_send_json_error(array('message' => $error_message));
 		return;
 	}
@@ -976,10 +976,12 @@ add_action('rest_api_init', function () {
 
 add_action('admin_enqueue_scripts', function ($hook) {
 	// Load scripts for Overview, Header and Footer settings pages
-	if ($hook !== 'toplevel_page_mt-tickets-overview' && 
-		$hook !== 'mt-tickets_page_mt-tickets-overview' && 
-		$hook !== 'mt-tickets_page_mt-tickets-settings' && 
-		$hook !== 'mt-tickets_page_mt-tickets-footer-settings') {
+	if (
+		$hook !== 'toplevel_page_mt-tickets-overview' &&
+		$hook !== 'mt-tickets_page_mt-tickets-overview' &&
+		$hook !== 'mt-tickets_page_mt-tickets-settings' &&
+		$hook !== 'mt-tickets_page_mt-tickets-footer-settings'
+	) {
 		return;
 	}
 

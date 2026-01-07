@@ -1,7 +1,7 @@
 {
     "apiVersion": 3,
-    "name": "mt-tickets/footer-logo",
-    "title": "MT Tickets: Footer Logo",
+    "name": "mt-tickets/footer-column1",
+    "title": "MT Tickets: Footer Column 1",
     "category": "widgets",
     "supports": {
         "html": false,
@@ -10,3 +10,4 @@
     "editorScript": "file:./index.js",
     "render": "file:./render.php"
 }
+
