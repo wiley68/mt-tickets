@@ -1162,6 +1162,35 @@ html.mt-panel-open {
     color: var(--wp--preset--color--primary, #0B3D91);
 }
 
+/* WooCommerce Address Form Input Fields */
+.woocommerce-address-fields input[type="text"],
+.woocommerce-address-fields input[type="email"],
+.woocommerce-address-fields input[type="tel"],
+.woocommerce-address-fields input[type="number"],
+.woocommerce-address-fields select,
+.woocommerce-address-fields textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--wp--preset--color--border, #E2E8F0);
+    background: var(--wp--preset--color--background, #FFFFFF);
+    color: var(--wp--preset--color--text, #0F172A);
+    font-size: 15px;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.woocommerce-address-fields input[type="text"]:focus,
+.woocommerce-address-fields input[type="email"]:focus,
+.woocommerce-address-fields input[type="tel"]:focus,
+.woocommerce-address-fields input[type="number"]:focus,
+.woocommerce-address-fields select:focus,
+.woocommerce-address-fields textarea:focus {
+    outline: none;
+    border-color: var(--wp--preset--color--primary, #0B3D91);
+    box-shadow: 0 0 0 3px rgba(11, 61, 145, 0.1);
+}
+
 /* WooCommerce My Account Inputs - match theme input style */
 .mt-account-input {
     width: 100%;
