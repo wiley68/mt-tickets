@@ -14,12 +14,35 @@ if ($has_woo && function_exists('WC') && WC() && isset(WC()->cart) && WC()->cart
 $user_icon = get_option('mt_tickets_header_user_icon', 'user');
 $cart_icon = get_option('mt_tickets_header_cart_icon', 'cart');
 
+// Tooltip for account button (changes when logged in)
+$account_tooltip = esc_attr__('Open account panel to sign in or manage your account', 'mt-tickets');
+if (is_user_logged_in()) {
+	$current_user = wp_get_current_user();
+	$display_name = $current_user ? ( $current_user->display_name ?: $current_user->user_login ) : '';
+	if ($display_name) {
+		$account_tooltip = sprintf(
+			/* translators: %s: user display name */
+			esc_html__('Logged in as %s', 'mt-tickets'),
+			$display_name
+		);
+	}
+}
+
 // Get account page URL
 $account_url = '';
 if ($has_woo && function_exists('wc_get_page_permalink')) {
 	$account_url = wc_get_page_permalink('myaccount');
 } else {
 	$account_url = admin_url('profile.php');
+}
+
+// Check if account registration is enabled in WooCommerce
+$allow_registration = false;
+if ($has_woo) {
+	$allow_registration = get_option('woocommerce_enable_myaccount_registration', 'no') === 'yes';
+} else {
+	// If WooCommerce is not active, check WordPress registration setting
+	$allow_registration = get_option('users_can_register', false);
 }
 
 function mt_tickets_svg_user($icon)
@@ -58,7 +81,7 @@ $user_icon_svg = mt_tickets_svg_user($user_icon);
 $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 ?>
 <div <?php echo $attrs; ?>>
-	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-account" data-account-url="<?php echo esc_url($account_url); ?>" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>" data-tooltip="<?php echo esc_attr__('Open account panel to sign in or manage your account', 'mt-tickets'); ?>">
+	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-account" data-account-url="<?php echo esc_url($account_url); ?>" data-is-logged-in="<?php echo is_user_logged_in() ? '1' : '0'; ?>" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>" data-tooltip="<?php echo esc_attr($account_tooltip); ?>">
 		<?php echo $user_icon_svg; ?>
 	</button>
 
@@ -119,11 +142,13 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 								<?php echo esc_html__('Log in', 'mt-tickets'); ?>
 							</button>
 						</div>
+						<?php if ($allow_registration) : ?>
 						<div class="mt-mini-account__form-group">
 							<button type="button" class="mt-mini-account__btn mt-mini-account__btn--secondary mt-mini-account__switch" data-view="register">
 								<?php echo esc_html__('Create an account', 'mt-tickets'); ?>
 							</button>
 						</div>
+						<?php endif; ?>
 						<?php wp_nonce_field('mt_account_login', 'mt_account_login_nonce'); ?>
 					</form>
 				<?php else : ?>

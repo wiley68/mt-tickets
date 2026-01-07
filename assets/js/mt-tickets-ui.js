@@ -78,12 +78,25 @@
             e.preventDefault();
             const panelId = btn.getAttribute('data-mt-open');
             
-            // If clicking account button and we're on account page, redirect to account URL
-            if (panelId === '#mt-panel-account' && isOnAccountPage()) {
-                const accountUrl = btn.getAttribute('data-account-url');
-                if (accountUrl) {
-                    window.location.href = accountUrl;
-                    return;
+            // If clicking account button
+            if (panelId === '#mt-panel-account') {
+                // If user is logged in, redirect to account page
+                const isLoggedIn = btn.getAttribute('data-is-logged-in') === '1';
+                if (isLoggedIn) {
+                    const accountUrl = btn.getAttribute('data-account-url');
+                    if (accountUrl) {
+                        window.location.href = accountUrl;
+                        return;
+                    }
+                }
+                
+                // If we're on account page, redirect to account URL
+                if (isOnAccountPage()) {
+                    const accountUrl = btn.getAttribute('data-account-url');
+                    if (accountUrl) {
+                        window.location.href = accountUrl;
+                        return;
+                    }
                 }
             }
             
@@ -855,7 +868,13 @@
     // Helper function to show account error
     function showAccountError(errorEl, message) {
         if (!errorEl) return;
-        errorEl.textContent = message;
+        
+        // Strip HTML tags and decode HTML entities
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = message;
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+        
+        errorEl.textContent = textContent.trim();
         errorEl.style.display = 'block';
         
         // Scroll to error if needed
