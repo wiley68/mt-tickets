@@ -1124,3 +1124,59 @@ html.mt-panel-open {
 .woocommerce-MyAccount-navigation ul li a:hover {
     color: var(--wp--preset--color--primary, #0B3D91);
 }
+
+/* WooCommerce My Account Buttons - Use theme button styles */
+.mt-account-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+.mt-account-btn--primary {
+    background: var(--wp--preset--color--primary, #0B3D91);
+    color: #FFFFFF;
+}
+
+.mt-account-btn--primary:hover {
+    background: var(--wp--preset--color--accent, #00A3A3);
+    color: #FFFFFF;
+}
+
+.mt-account-btn--secondary {
+    background: var(--wp--preset--color--background, #FFFFFF);
+    color: var(--wp--preset--color--text, #0F172A);
+    border-color: var(--wp--preset--color--border, #E2E8F0);
+}
+
+.mt-account-btn--secondary:hover {
+    background: var(--wp--preset--color--surface, #F8FAFC);
+    border-color: var(--wp--preset--color--primary, #0B3D91);
+    color: var(--wp--preset--color--primary, #0B3D91);
+}
+
+/* WooCommerce My Account Inputs - match theme input style */
+.mt-account-input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--wp--preset--color--border, #E2E8F0);
+    background: var(--wp--preset--color--background, #FFFFFF);
+    color: var(--wp--preset--color--text, #0F172A);
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mt-account-input:focus {
+    outline: none;
+    border-color: var(--wp--preset--color--primary, #0B3D91);
+    box-shadow: 0 0 0 2px rgba(11, 61, 145, 0.1);
+}
