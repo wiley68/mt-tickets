@@ -60,7 +60,7 @@
             {
               "fontFamily": "Exo 2",
               "fontStyle": "normal",
-              "fontWeight": "100 900",
+              "fontWeight": "400",
               "src": [
                 "file:./assets/fonts/exo-2-v26-cyrillic_latin-regular.woff2"
               ]
@@ -68,9 +68,41 @@
             {
               "fontFamily": "Exo 2",
               "fontStyle": "italic",
-              "fontWeight": "100 900",
+              "fontWeight": "400",
               "src": [
                 "file:./assets/fonts/exo-2-v26-cyrillic_latin-italic.woff2"
+              ]
+            },
+            {
+              "fontFamily": "Exo 2",
+              "fontStyle": "normal",
+              "fontWeight": "600",
+              "src": [
+                "file:./assets/fonts/exo-2-v26-cyrillic_latin-600.woff2"
+              ]
+            },
+            {
+              "fontFamily": "Exo 2",
+              "fontStyle": "italic",
+              "fontWeight": "600",
+              "src": [
+                "file:./assets/fonts/exo-2-v26-cyrillic_latin-600italic.woff2"
+              ]
+            },
+            {
+              "fontFamily": "Exo 2",
+              "fontStyle": "normal",
+              "fontWeight": "700",
+              "src": [
+                "file:./assets/fonts/exo-2-v26-cyrillic_latin-700.woff2"
+              ]
+            },
+            {
+              "fontFamily": "Exo 2",
+              "fontStyle": "italic",
+              "fontWeight": "700",
+              "src": [
+                "file:./assets/fonts/exo-2-v26-cyrillic_latin-700italic.woff2"
               ]
             }
           ]
