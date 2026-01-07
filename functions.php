@@ -447,6 +447,84 @@ function mt_account_login()
 }
 
 /**
+ * AJAX handler for account registration (email only).
+ */
+add_action('wp_ajax_mt_account_register', 'mt_account_register');
+add_action('wp_ajax_nopriv_mt_account_register', 'mt_account_register');
+
+function mt_account_register()
+{
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mt_tickets_account_nonce')) {
+		wp_send_json_error(array('message' => __('Security check failed.', 'mt-tickets')));
+		return;
+	}
+
+	// Check if registration is allowed
+	$registration_allowed = false;
+	if (class_exists('WooCommerce')) {
+		$registration_allowed = get_option('woocommerce_enable_myaccount_registration', 'no') === 'yes';
+	}
+	if (!$registration_allowed) {
+		// Fallback to WP setting
+		$registration_allowed = (bool) get_option('users_can_register', false);
+	}
+	if (!$registration_allowed) {
+		wp_send_json_error(array('message' => __('Account registration is disabled.', 'mt-tickets')));
+		return;
+	}
+
+	$email = isset($_POST['user_email']) ? sanitize_email($_POST['user_email']) : '';
+	if (empty($email) || !is_email($email)) {
+		wp_send_json_error(array('message' => __('Please enter a valid email address.', 'mt-tickets')));
+		return;
+	}
+
+	if (email_exists($email)) {
+		wp_send_json_error(array('message' => __('An account already exists for this email address. Please log in.', 'mt-tickets')));
+		return;
+	}
+
+	// Derive username from email
+	$username_base = sanitize_user(current(explode('@', $email)));
+	if (empty($username_base)) {
+		$username_base = 'user';
+	}
+	$username = $username_base;
+	$suffix = 1;
+	while (username_exists($username)) {
+		$username = $username_base . $suffix;
+		$suffix++;
+	}
+
+	// Generate password
+	$password = wp_generate_password(12, true);
+
+	$user_id = wp_create_user($username, $password, $email);
+
+	if (is_wp_error($user_id)) {
+		$error_message = $user_id->get_error_message();
+		if (empty($error_message)) {
+			$error_message = __('Registration failed. Please try again.', 'mt-tickets');
+		}
+		wp_send_json_error(array('message' => $error_message));
+		return;
+	}
+
+	// Optionally send notification to user
+	wp_new_user_notification($user_id, null, 'user');
+
+	// Auto login the user
+	wp_set_current_user($user_id);
+	wp_set_auth_cookie($user_id, true);
+
+	wp_send_json_success(array(
+		'message' => __('Registration successful!', 'mt-tickets'),
+		'redirect' => function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : admin_url('profile.php'),
+	));
+}
+
+/**
  * AJAX handler for updating cart item quantity
  */
 add_action('wp_ajax_mt_update_cart_quantity', 'mt_update_cart_quantity');

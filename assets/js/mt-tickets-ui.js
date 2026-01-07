@@ -44,6 +44,17 @@
 
         // Focus first input in account panel when opened
         if (id === '#mt-panel-account') {
+            // Reset to sign-in view every time panel opens
+            const titleEl = panel.querySelector('.mt-mini-account__title');
+            const signInForm = panel.querySelector('.mt-mini-account__form--signin');
+            const registerForm = panel.querySelector('.mt-mini-account__form--register');
+            const errorEl = panel.querySelector('.mt-mini-account__error');
+
+            if (titleEl) titleEl.textContent = 'Sign in';
+            if (signInForm) signInForm.style.display = 'block';
+            if (registerForm) registerForm.style.display = 'none';
+            if (errorEl) errorEl.style.display = 'none';
+
             setTimeout(() => {
                 const firstInput = panel.querySelector('#user_login');
                 if (firstInput) {
@@ -757,7 +768,7 @@
         setupCartPageListeners();
     }
 
-    // Account Panel: Switch to register view
+    // Account Panel: Switch views (signin <-> register)
     document.addEventListener('click', function (e) {
         const switchBtn = e.target.closest('.mt-mini-account__switch');
         if (!switchBtn) return;
@@ -765,22 +776,88 @@
         e.preventDefault();
         const view = switchBtn.getAttribute('data-view');
         const titleEl = qs('.mt-mini-account__title');
-        const bodyEl = qs('.mt-mini-account__body');
+        const errorEl = qs('.mt-mini-account__error');
+        const signInForm = qs('.mt-mini-account__form--signin');
+        const registerForm = qs('.mt-mini-account__form--register');
 
-        if (view === 'register' && titleEl && bodyEl) {
-            // Update title
-            titleEl.textContent = 'Create an account';
-            // Switch view (will be implemented in next step)
-            // For now, just update the title
-            switchBtn.setAttribute('data-view', 'signin');
-            switchBtn.textContent = 'Sign in';
-        } else if (view === 'signin' && titleEl && bodyEl) {
-            // Update title
-            titleEl.textContent = 'Sign in';
-            // Switch view (will be implemented in next step)
-            // For now, just update the title
-            switchBtn.setAttribute('data-view', 'register');
-            switchBtn.textContent = 'Create an account';
+        // Hide errors when switching
+        if (errorEl) errorEl.style.display = 'none';
+
+        if (view === 'register') {
+            if (titleEl) titleEl.textContent = 'Sign in';
+            if (signInForm) signInForm.style.display = 'none';
+            if (registerForm) registerForm.style.display = 'block';
+        } else if (view === 'signin') {
+            if (titleEl) titleEl.textContent = 'Sign in';
+            if (registerForm) registerForm.style.display = 'none';
+            if (signInForm) signInForm.style.display = 'block';
+        }
+    });
+
+    // Account Panel: AJAX Registration (email only)
+    document.addEventListener('click', async function (e) {
+        const registerBtn = e.target.closest('.mt-mini-account__register-btn');
+        if (!registerBtn) return;
+
+        e.preventDefault();
+
+        const form = registerBtn.closest('.mt-mini-account__form--register');
+        if (!form) return;
+
+        const emailInput = form.querySelector('input[name="user_email"]');
+        const errorEl = qs('.mt-mini-account__error');
+
+        const email = emailInput ? emailInput.value.trim() : '';
+        if (!email) {
+            showAccountError(errorEl, 'Please enter a valid email address.');
+            return;
+        }
+
+        registerBtn.disabled = true;
+        registerBtn.classList.add('is-loading');
+        if (errorEl) errorEl.style.display = 'none';
+
+        if (typeof mtTicketsAccount === 'undefined' || !mtTicketsAccount.ajax_url) {
+            showAccountError(errorEl, 'Registration is not available.');
+            registerBtn.disabled = false;
+            registerBtn.classList.remove('is-loading');
+            return;
+        }
+
+        try {
+            const response = await fetch(mtTicketsAccount.ajax_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'mt_account_register',
+                    nonce: mtTicketsAccount.nonce,
+                    user_email: email,
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                if (data.data && data.data.redirect) {
+                    window.location.href = data.data.redirect;
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                const errorMessage = data.data && data.data.message
+                    ? data.data.message
+                    : 'Registration failed. Please try again.';
+                showAccountError(errorEl, errorMessage);
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('is-loading');
+            }
+        } catch (err) {
+            console.error('Registration failed', err);
+            showAccountError(errorEl, 'An error occurred. Please try again.');
+            registerBtn.disabled = false;
+            registerBtn.classList.remove('is-loading');
         }
     });
 
@@ -866,7 +943,7 @@
     });
 
     // Helper function to show account error
-    function showAccountError(errorEl, message) {
+    function showAccountError(errorEl, message, formEl) {
         if (!errorEl) return;
         
         // Strip HTML tags and decode HTML entities
@@ -879,5 +956,10 @@
         
         // Scroll to error if needed
         errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            errorEl.style.display = 'none';
+        }, 5000);
     }
 })();

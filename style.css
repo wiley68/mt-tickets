@@ -931,6 +931,9 @@ html.mt-panel-open {
     display: flex;
     flex-direction: column;
 }
+.mt-mini-account__form--register {
+    display: none;
+}
 
 .mt-mini-account__form-group {
     margin-bottom: 16px;
@@ -1000,6 +1003,13 @@ html.mt-panel-open {
 .mt-mini-account__link:hover {
     color: var(--wp--preset--color--accent, #00A3A3);
     text-decoration: underline;
+}
+
+.mt-mini-account__privacy {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--wp--preset--color--muted, #64748B);
+    margin: 0;
 }
 
 .mt-mini-account__btn {

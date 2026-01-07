@@ -45,6 +45,9 @@ if ($has_woo) {
 	$allow_registration = get_option('users_can_register', false);
 }
 
+// Privacy policy URL
+$privacy_policy_url = function_exists('get_privacy_policy_url') ? get_privacy_policy_url() : '';
+
 function mt_tickets_svg_user($icon)
 {
 	$common = 'width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"';
@@ -79,6 +82,9 @@ function mt_tickets_svg_cart($icon)
 
 $user_icon_svg = mt_tickets_svg_user($user_icon);
 $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
+// Privacy policy URL for registration note
+$privacy_policy_url = function_exists('get_privacy_policy_url') ? get_privacy_policy_url() : home_url('/privacy-policy/');
+
 ?>
 <div <?php echo $attrs; ?>>
 	<button class="mt-header-icon-btn" type="button" data-mt-open="#mt-panel-account" data-account-url="<?php echo esc_url($account_url); ?>" data-is-logged-in="<?php echo is_user_logged_in() ? '1' : '0'; ?>" aria-label="<?php echo esc_attr__('Account', 'mt-tickets'); ?>" data-tooltip="<?php echo esc_attr($account_tooltip); ?>">
@@ -151,6 +157,37 @@ $cart_icon_svg = mt_tickets_svg_cart($cart_icon);
 						<?php endif; ?>
 						<?php wp_nonce_field('mt_account_login', 'mt_account_login_nonce'); ?>
 					</form>
+
+					<!-- Register form -->
+					<?php if ($allow_registration) : ?>
+					<form class="mt-mini-account__form mt-mini-account__form--register" method="post" style="display:none;">
+						<div class="mt-mini-account__form-group">
+							<input type="email" name="user_email" class="mt-mini-account__input" placeholder="<?php echo esc_attr__('Email address', 'mt-tickets'); ?>" autocomplete="email" required>
+						</div>
+						<div class="mt-mini-account__form-group">
+							<p class="mt-mini-account__privacy">
+								<?php echo esc_html__('Your personal data will be used to support your experience on this website, to manage access to your account, and for other purposes described in our', 'mt-tickets'); ?>
+								<?php if ($privacy_policy_url) : ?>
+									<a href="<?php echo esc_url($privacy_policy_url); ?>" target="_blank" rel="noopener" class="mt-mini-account__link">
+										<?php echo esc_html__('privacy policy', 'mt-tickets'); ?>
+									</a>.
+								<?php else : ?>
+									<?php echo esc_html__('privacy policy.', 'mt-tickets'); ?>
+								<?php endif; ?>
+							</p>
+						</div>
+						<div class="mt-mini-account__form-group">
+							<button type="button" class="mt-mini-account__btn mt-mini-account__btn--primary mt-mini-account__register-btn">
+								<?php echo esc_html__('Registration', 'mt-tickets'); ?>
+							</button>
+						</div>
+						<div class="mt-mini-account__form-group">
+							<button type="button" class="mt-mini-account__btn mt-mini-account__btn--secondary mt-mini-account__switch" data-view="signin">
+								<?php echo esc_html__('Already has an account', 'mt-tickets'); ?>
+							</button>
+						</div>
+					</form>
+					<?php endif; ?>
 				<?php else : ?>
 					<!-- Logged in view (will be implemented later) -->
 					<div class="mt-mini-account__logged-in">
