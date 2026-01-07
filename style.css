@@ -1089,3 +1089,38 @@ html.mt-panel-open {
     border-radius: 50%;
     animation: mt-spin 0.6s linear infinite;
 }
+
+/* WooCommerce My Account Page Styles */
+/* Add top margin to both navigation and content */
+.woocommerce-account .woocommerce-MyAccount-navigation,
+.woocommerce-account .woocommerce-MyAccount-content {
+    margin-top: 20px;
+}
+
+/* My Account Navigation - Table-like appearance with dividers */
+.woocommerce-MyAccount-navigation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.woocommerce-MyAccount-navigation ul li {
+    border-bottom: 1px solid var(--wp--preset--color--border, #E2E8F0);
+    padding: 0;
+    margin: 0;
+}
+
+.woocommerce-MyAccount-navigation ul li:last-child {
+    border-bottom: none;
+}
+
+.woocommerce-MyAccount-navigation ul li a {
+    display: block;
+    padding: 8px 0;
+    text-decoration: none;
+    color: var(--wp--preset--color--text, #0f172a);
+}
+
+.woocommerce-MyAccount-navigation ul li a:hover {
+    color: var(--wp--preset--color--primary, #0B3D91);
+}
