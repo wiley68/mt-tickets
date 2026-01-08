@@ -1219,3 +1219,65 @@ html.mt-panel-open {
 footer .wp-block-columns .wp-block-column h4 {
     font-weight: 600 !important;
 }
+
+/* Footer first row: align all column contents to the top
+   NOTE: do NOT rely on an actual <footer> tag existing (block themes often render template parts as <div>). */
+.wp-block-group.mt-footer-top > .wp-block-columns.is-layout-flex.wp-block-columns-is-layout-flex {
+    align-items: flex-start !important;
+    align-content: flex-start !important;
+}
+
+/* Ensure each column sits at the top (in case something sets align-self) */
+.wp-block-group.mt-footer-top > .wp-block-columns.is-layout-flex.wp-block-columns-is-layout-flex > .wp-block-column {
+    align-self: flex-start !important;
+}
+
+/* Normalize top spacing so headings start from the same baseline across columns */
+.wp-block-group.mt-footer-top > .wp-block-columns > .wp-block-column > :first-child {
+    margin-top: 0 !important;
+}
+
+/* Also cover the case where the first real content is nested (our custom blocks output a wrapper div) */
+.wp-block-group.mt-footer-top > .wp-block-columns > .wp-block-column > :first-child > :first-child {
+    margin-top: 0 !important;
+}
+
+/* Footer Column 2 Menu - Vertical Menu */
+.mt-footer-column2-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.mt-footer-column2-menu__title {
+    font-weight: 600;
+    font-size: 1em;
+    margin: 0 0 12px 0;
+    padding: 0;
+    color: var(--wp--preset--color--text, #0F172A);
+}
+
+.mt-footer-column2-menu__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mt-footer-column2-menu__list li {
+    margin: 0;
+    padding: 0;
+}
+
+.mt-footer-column2-menu__list a {
+    display: block;
+    color: var(--wp--preset--color--text, #0F172A);
+    text-decoration: none;
+    padding: 4px 0;
+    transition: color 0.2s ease;
+}
+
+.mt-footer-column2-menu__list a:hover {
+    color: var(--wp--preset--color--primary, #0B3D91);
+}

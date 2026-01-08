@@ -1,0 +1,14 @@
+{
+    "apiVersion": 3,
+    "name": "mt-tickets/footer-column2",
+    "title": "MT Tickets: Footer Column 2",
+    "category": "widgets",
+    "description": "Renders a vertical menu in the footer second column from the 'Footer Column 2 Menu' location.",
+    "textdomain": "mt-tickets",
+    "supports": {
+        "html": false,
+        "inserter": false
+    },
+    "editorScript": "file:./index.js",
+    "render": "file:./render.php"
+}

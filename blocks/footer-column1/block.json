@@ -10,4 +10,3 @@
     "editorScript": "file:./index.js",
     "render": "file:./render.php"
 }
-
