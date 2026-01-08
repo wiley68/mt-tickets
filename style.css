@@ -1281,3 +1281,43 @@ footer .wp-block-columns .wp-block-column h4 {
 .mt-footer-column2-menu__list a:hover {
     color: var(--wp--preset--color--primary, #0B3D91);
 }
+
+/* Footer Column 3 Menu - Vertical Menu */
+.mt-footer-column3-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.mt-footer-column3-menu__title {
+    font-weight: 600;
+    font-size: 1em;
+    margin: 0 0 12px 0;
+    padding: 0;
+    color: var(--wp--preset--color--text, #0F172A);
+}
+
+.mt-footer-column3-menu__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mt-footer-column3-menu__list li {
+    margin: 0;
+    padding: 0;
+}
+
+.mt-footer-column3-menu__list a {
+    display: block;
+    color: var(--wp--preset--color--text, #0F172A);
+    text-decoration: none;
+    padding: 4px 0;
+    transition: color 0.2s ease;
+}
+
+.mt-footer-column3-menu__list a:hover {
+    color: var(--wp--preset--color--primary, #0B3D91);
+}

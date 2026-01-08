@@ -354,7 +354,7 @@ add_action('admin_init', function () {
 		'mt_tickets_footer_section'
 	);
 
-	add_settings_field(
+		add_settings_field(
 		'mt_tickets_footer_column2_menu_hint',
 		__('Footer Column 2 Menu', 'mt-tickets'),
 		function () {
@@ -365,6 +365,35 @@ add_action('admin_init', function () {
 
 			echo '<p class="description">';
 			echo esc_html__('The footer second column displays a WordPress menu assigned to the "Footer Column 2 Menu" location.', 'mt-tickets');
+			echo '</p>';
+
+			if ($info['assigned']) {
+				$name = $info['menu_name'] ?: __('(assigned)', 'mt-tickets');
+				echo '<p><strong>' . esc_html__('Current:', 'mt-tickets') . '</strong> ' . esc_html($name) . '</p>';
+			} else {
+				echo '<p style="color:#b32d2e;"><strong>' . esc_html__('Current:', 'mt-tickets') . '</strong> ' . esc_html__('Not assigned', 'mt-tickets') . '</p>';
+			}
+
+			echo '<p>';
+			echo '<a class="button button-secondary" href="' . esc_url($menus_url) . '">' . esc_html__('Manage Menus', 'mt-tickets') . '</a> ';
+			echo '<a class="button button-secondary" style="margin-left:6px" href="' . esc_url($locations_url) . '">' . esc_html__('Menu Locations', 'mt-tickets') . '</a>';
+			echo '</p>';
+		},
+		'mt-tickets-footer-settings',
+		'mt_tickets_footer_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_footer_column3_menu_hint',
+		__('Footer Column 3 Menu', 'mt-tickets'),
+		function () {
+			$menus_url     = admin_url('nav-menus.php');
+			$locations_url = admin_url('nav-menus.php?action=locations');
+
+			$info = mt_tickets_get_footer_column3_menu_info();
+
+			echo '<p class="description">';
+			echo esc_html__('The footer third column displays a WordPress menu assigned to the "Footer Column 3 Menu" location.', 'mt-tickets');
 			echo '</p>';
 
 			if ($info['assigned']) {
@@ -585,13 +614,39 @@ function mt_tickets_get_footer_column2_menu_info()
 	);
 }
 
+function mt_tickets_get_footer_column3_menu_info()
+{
+	$assigned = has_nav_menu('mt_tickets_footer_column3');
+
+	$menu_id = 0;
+	$menu_name = '';
+
+	if ($assigned) {
+		$locations = get_nav_menu_locations();
+		$menu_id = (int) ($locations['mt_tickets_footer_column3'] ?? 0);
+
+		if ($menu_id) {
+			$term = get_term($menu_id, 'nav_menu');
+			if ($term && !is_wp_error($term)) {
+				$menu_name = (string) $term->name;
+			}
+		}
+	}
+
+	return array(
+		'assigned'  => $assigned,
+		'menu_id'   => $menu_id,
+		'menu_name' => $menu_name,
+	);
+}
+
 /**
  * Register dynamic blocks (no JS build needed).
  */
 add_action('init', function () {
 	$base = __DIR__ . '/blocks';
 
-	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-column1', 'footer-column2') as $b) {
+	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-column1', 'footer-column2', 'footer-column3') as $b) {
 		if (is_dir($base . '/' . $b)) {
 			register_block_type($base . '/' . $b);
 		}
@@ -974,6 +1029,7 @@ add_action('after_setup_theme', function () {
 		'mt_tickets_topbar'  => __('Top Bar Menu', 'mt-tickets'),
 		'mt_tickets_primary' => __('Primary Menu', 'mt-tickets'),
 		'mt_tickets_footer_column2' => __('Footer Column 2 Menu', 'mt-tickets'),
+		'mt_tickets_footer_column3' => __('Footer Column 3 Menu', 'mt-tickets'),
 	));
 });
 
@@ -1094,6 +1150,37 @@ add_action('rest_api_init', function () {
 			if ($assigned) {
 				$locations = get_nav_menu_locations();
 				$menu_id = (int) ($locations['mt_tickets_footer_column2'] ?? 0);
+				if ($menu_id) {
+					$term = get_term((int)$menu_id, 'nav_menu');
+					if ($term && !is_wp_error($term)) {
+						$menu_name = (string) $term->name;
+					}
+				}
+			}
+
+			return array(
+				'menu' => array(
+					'assigned' => (bool)$assigned,
+					'name'     => $menu_name,
+					'items'    => $items_out,
+				),
+			);
+		},
+	));
+
+	register_rest_route('mt-tickets/v1', '/footer-column3', array(
+		'methods'  => 'GET',
+		'permission_callback' => function () {
+			return current_user_can('edit_theme_options');
+		},
+		'callback' => function () {
+			$assigned = has_nav_menu('mt_tickets_footer_column3');
+			$menu_name = '';
+			$items_out = array();
+
+			if ($assigned) {
+				$locations = get_nav_menu_locations();
+				$menu_id = (int) ($locations['mt_tickets_footer_column3'] ?? 0);
 				if ($menu_id) {
 					$term = get_term((int)$menu_id, 'nav_menu');
 					if ($term && !is_wp_error($term)) {
