@@ -301,6 +301,18 @@ add_action('admin_init', function () {
 		'default'           => 'Ticket sales for carriers, schedules and reservations. The theme is independent of the plugin.',
 	));
 
+	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_column4_title', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_text_field',
+		'default'           => 'For Contact',
+	));
+
+	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_column4_description', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_textarea_field',
+		'default'           => "Address:\nPhone:\nEmail:\nOpening hours:",
+	));
+
 	add_settings_section(
 		'mt_tickets_footer_section',
 		__('Footer', 'mt-tickets'),
@@ -383,7 +395,7 @@ add_action('admin_init', function () {
 		'mt_tickets_footer_section'
 	);
 
-	add_settings_field(
+		add_settings_field(
 		'mt_tickets_footer_column3_menu_hint',
 		__('Footer Column 3 Menu', 'mt-tickets'),
 		function () {
@@ -407,6 +419,30 @@ add_action('admin_init', function () {
 			echo '<a class="button button-secondary" href="' . esc_url($menus_url) . '">' . esc_html__('Manage Menus', 'mt-tickets') . '</a> ';
 			echo '<a class="button button-secondary" style="margin-left:6px" href="' . esc_url($locations_url) . '">' . esc_html__('Menu Locations', 'mt-tickets') . '</a>';
 			echo '</p>';
+		},
+		'mt-tickets-footer-settings',
+		'mt_tickets_footer_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_footer_column4_title',
+		__('Footer Column 4 Title', 'mt-tickets'),
+		function () {
+			$value = get_option('mt_tickets_footer_column4_title', 'For Contact');
+			echo '<input type="text" name="mt_tickets_footer_column4_title" value="' . esc_attr($value) . '" class="regular-text" />';
+			echo '<p class="description">' . esc_html__('The title displayed in the footer fourth column.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-footer-settings',
+		'mt_tickets_footer_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_footer_column4_description',
+		__('Footer Column 4 Description', 'mt-tickets'),
+		function () {
+			$value = get_option('mt_tickets_footer_column4_description', "Address:\nPhone:\nEmail:\nOpening hours:");
+			echo '<textarea name="mt_tickets_footer_column4_description" rows="6" class="large-text">' . esc_textarea($value) . '</textarea>';
+			echo '<p class="description">' . esc_html__('The description displayed in the footer fourth column. Each line will be displayed as a separate paragraph.', 'mt-tickets') . '</p>';
 		},
 		'mt-tickets-footer-settings',
 		'mt_tickets_footer_section'
@@ -646,7 +682,7 @@ function mt_tickets_get_footer_column3_menu_info()
 add_action('init', function () {
 	$base = __DIR__ . '/blocks';
 
-	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-column1', 'footer-column2', 'footer-column3') as $b) {
+	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-column1', 'footer-column2', 'footer-column3', 'footer-column4') as $b) {
 		if (is_dir($base . '/' . $b)) {
 			register_block_type($base . '/' . $b);
 		}
@@ -1195,6 +1231,25 @@ add_action('rest_api_init', function () {
 					'name'     => $menu_name,
 					'items'    => $items_out,
 				),
+			);
+		},
+	));
+
+	register_rest_route('mt-tickets/v1', '/footer-column4', array(
+		'methods'  => 'GET',
+		'permission_callback' => function () {
+			return current_user_can('edit_theme_options');
+		},
+		'callback' => function () {
+			$default_title = 'For Contact';
+			$title = get_option('mt_tickets_footer_column4_title', $default_title);
+
+			$default_description = "Address:\nPhone:\nEmail:\nOpening hours:";
+			$description = get_option('mt_tickets_footer_column4_description', $default_description);
+
+			return array(
+				'title'       => $title,
+				'description' => $description,
 			);
 		},
 	));

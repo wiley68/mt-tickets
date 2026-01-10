@@ -1321,3 +1321,32 @@ footer .wp-block-columns .wp-block-column h4 {
 .mt-footer-column3-menu__list a:hover {
     color: var(--wp--preset--color--primary, #0B3D91);
 }
+
+/* Footer Column 4 - Contact Information */
+.mt-footer-column4 {
+    display: flex;
+    flex-direction: column;
+}
+
+.mt-footer-column4__title {
+    font-weight: 600;
+    font-size: 1em;
+    margin: 0 0 12px 0;
+    padding: 0;
+    color: var(--wp--preset--color--text, #0F172A);
+}
+
+.mt-footer-column4__description {
+    margin: 0;
+    padding: 0;
+}
+
+.mt-footer-column4__description p {
+    margin: 0 0 8px 0;
+    padding: 0;
+    color: var(--wp--preset--color--text, #0F172A);
+}
+
+.mt-footer-column4__description p:last-child {
+    margin-bottom: 0;
+}
