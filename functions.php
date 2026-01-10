@@ -104,6 +104,27 @@ add_action('admin_init', function () {
 		'default'           => 'cart',
 	));
 
+	// Header Hero title
+	register_setting('mt_tickets_settings', 'mt_tickets_header_hero_title', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_text_field',
+		'default'           => 'Buy a bus ticket quickly and conveniently',
+	));
+
+	// Header Hero description
+	register_setting('mt_tickets_settings', 'mt_tickets_header_hero_description', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_textarea_field',
+		'default'           => 'Search by destination, date and carrier',
+	));
+
+	// Header Hero search shortcode
+	register_setting('mt_tickets_settings', 'mt_tickets_header_hero_search_shortcode', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_text_field',
+		'default'           => '',
+	));
+
 	add_settings_section(
 		'mt_tickets_header_section',
 		__('Header', 'mt-tickets'),
@@ -282,6 +303,44 @@ add_action('admin_init', function () {
 		'mt_tickets_header_section'
 	);
 
+	add_settings_field(
+		'mt_tickets_header_hero_title',
+		__('Header Hero Title', 'mt-tickets'),
+		function () {
+			$default = 'Buy a bus ticket quickly and conveniently';
+			$value = get_option('mt_tickets_header_hero_title', $default);
+			echo '<input type="text" name="mt_tickets_header_hero_title" value="' . esc_attr($value) . '" class="regular-text" />';
+			echo '<p class="description">' . esc_html__('The main title displayed in the header hero section.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-settings',
+		'mt_tickets_header_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_header_hero_description',
+		__('Header Hero Description', 'mt-tickets'),
+		function () {
+			$default = 'Search by destination, date and carrier';
+			$value = get_option('mt_tickets_header_hero_description', $default);
+			echo '<textarea name="mt_tickets_header_hero_description" rows="3" class="large-text">' . esc_textarea($value) . '</textarea>';
+			echo '<p class="description">' . esc_html__('The descriptive text displayed below the title in the header hero section.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-settings',
+		'mt_tickets_header_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_header_hero_search_shortcode',
+		__('Header Hero Search Shortcode', 'mt-tickets'),
+		function () {
+			$value = get_option('mt_tickets_header_hero_search_shortcode', '');
+			echo '<input type="text" name="mt_tickets_header_hero_search_shortcode" value="' . esc_attr($value) . '" class="regular-text" placeholder="[shortcode_name]" />';
+			echo '<p class="description">' . esc_html__('Enter the shortcode identifier for the search form (e.g., [ticket_search]). Leave empty to hide the search section.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-settings',
+		'mt_tickets_header_section'
+	);
+
 	// Footer settings registration
 	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_column1_title', array(
 		'type'              => 'string',
@@ -378,7 +437,7 @@ add_action('admin_init', function () {
 		'mt_tickets_footer_section'
 	);
 
-		add_settings_field(
+	add_settings_field(
 		'mt_tickets_footer_column2_menu_hint',
 		__('Footer Column 2 Menu', 'mt-tickets'),
 		function () {
@@ -407,7 +466,7 @@ add_action('admin_init', function () {
 		'mt_tickets_footer_section'
 	);
 
-		add_settings_field(
+	add_settings_field(
 		'mt_tickets_footer_column3_menu_hint',
 		__('Footer Column 3 Menu', 'mt-tickets'),
 		function () {
@@ -497,8 +556,8 @@ add_action('admin_init', function () {
 
 			// Media uploader script
 			wp_enqueue_media();
-			?>
-			<script>
+?>
+		<script>
 			jQuery(document).ready(function($) {
 				var uploadBtn = $('#mt_footer_payment_icons_upload_btn');
 				var removeBtn = $('#mt_footer_payment_icons_remove_btn');
@@ -534,8 +593,8 @@ add_action('admin_init', function () {
 					removeBtn.hide();
 				});
 			});
-			</script>
-			<?php
+		</script>
+	<?php
 		},
 		'mt-tickets-footer-settings',
 		'mt_tickets_footer_section'
@@ -549,7 +608,7 @@ function mt_tickets_render_overview_page()
 	$theme = wp_get_theme();
 	$theme_version = $theme->get('Version');
 	$theme_name = $theme->get('Name');
-?>
+	?>
 	<div class="wrap">
 		<h1><?php echo esc_html__('MT Tickets Theme', 'mt-tickets'); ?></h1>
 
@@ -775,7 +834,7 @@ function mt_tickets_get_footer_column3_menu_info()
 add_action('init', function () {
 	$base = __DIR__ . '/blocks';
 
-	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-column1', 'footer-column2', 'footer-column3', 'footer-column4', 'footer-copyright') as $b) {
+	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'header-hero', 'footer-column1', 'footer-column2', 'footer-column3', 'footer-column4', 'footer-copyright') as $b) {
 		if (is_dir($base . '/' . $b)) {
 			register_block_type($base . '/' . $b);
 		}
@@ -1236,6 +1295,28 @@ add_action('rest_api_init', function () {
 					'name'     => $menu_name,
 					'items'    => $items_out,
 				),
+			);
+		},
+	));
+
+	register_rest_route('mt-tickets/v1', '/header-hero', array(
+		'methods'  => 'GET',
+		'permission_callback' => function () {
+			return current_user_can('edit_theme_options');
+		},
+		'callback' => function () {
+			$default_title = 'Buy a bus ticket quickly and conveniently';
+			$title = get_option('mt_tickets_header_hero_title', $default_title);
+
+			$default_description = 'Search by destination, date and carrier';
+			$description = get_option('mt_tickets_header_hero_description', $default_description);
+
+			$shortcode = get_option('mt_tickets_header_hero_search_shortcode', '');
+
+			return array(
+				'title' => $title,
+				'description' => $description,
+				'shortcode' => $shortcode,
 			);
 		},
 	));

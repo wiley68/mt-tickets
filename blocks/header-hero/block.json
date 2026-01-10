@@ -1,0 +1,12 @@
+{
+    "apiVersion": 3,
+    "name": "mt-tickets/header-hero",
+    "title": "MT Tickets: Header Hero",
+    "category": "widgets",
+    "supports": {
+        "html": false,
+        "inserter": false
+    },
+    "editorScript": "file:./index.js",
+    "render": "file:./render.php"
+}
