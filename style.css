@@ -931,6 +931,7 @@ html.mt-panel-open {
     display: flex;
     flex-direction: column;
 }
+
 .mt-mini-account__form--register {
     display: none;
 }
@@ -1016,7 +1017,7 @@ html.mt-panel-open {
     display: block;
     width: 100%;
     padding: 12px 24px;
-    border-radius: 8px;
+    border-radius: 2px;
     text-align: center;
     font-size: 15px;
     font-weight: 600;
@@ -1129,7 +1130,7 @@ html.mt-panel-open {
 .mt-account-btn {
     display: inline-block;
     padding: 12px 24px;
-    border-radius: 8px;
+    border-radius: 2px;
     text-align: center;
     font-size: 15px;
     font-weight: 600;
@@ -1222,23 +1223,23 @@ footer .wp-block-columns .wp-block-column h4 {
 
 /* Footer first row: align all column contents to the top
    NOTE: do NOT rely on an actual <footer> tag existing (block themes often render template parts as <div>). */
-.wp-block-group.mt-footer-top > .wp-block-columns.is-layout-flex.wp-block-columns-is-layout-flex {
+.wp-block-group.mt-footer-top>.wp-block-columns.is-layout-flex.wp-block-columns-is-layout-flex {
     align-items: flex-start !important;
     align-content: flex-start !important;
 }
 
 /* Ensure each column sits at the top (in case something sets align-self) */
-.wp-block-group.mt-footer-top > .wp-block-columns.is-layout-flex.wp-block-columns-is-layout-flex > .wp-block-column {
+.wp-block-group.mt-footer-top>.wp-block-columns.is-layout-flex.wp-block-columns-is-layout-flex>.wp-block-column {
     align-self: flex-start !important;
 }
 
 /* Normalize top spacing so headings start from the same baseline across columns */
-.wp-block-group.mt-footer-top > .wp-block-columns > .wp-block-column > :first-child {
+.wp-block-group.mt-footer-top>.wp-block-columns>.wp-block-column> :first-child {
     margin-top: 0 !important;
 }
 
 /* Also cover the case where the first real content is nested (our custom blocks output a wrapper div) */
-.wp-block-group.mt-footer-top > .wp-block-columns > .wp-block-column > :first-child > :first-child {
+.wp-block-group.mt-footer-top>.wp-block-columns>.wp-block-column> :first-child> :first-child {
     margin-top: 0 !important;
 }
 
@@ -1389,4 +1390,33 @@ footer .wp-block-columns .wp-block-column h4 {
     height: 24px;
     width: auto;
     display: block;
+}
+
+/* =========================
+   WORDPRESS BLOCK BUTTONS
+   ========================= */
+.wp-block-button__link,
+.wp-element-button,
+.wp-block-button .wp-block-button__link,
+.wp-block-button a {
+    border-radius: 2px !important;
+}
+
+/* Theme button hover effect */
+.wp-block-button__link.has-primary-background-color:hover {
+    background-color: var(--wp--preset--color--accent);
+    transition: background-color 0.2s ease;
+}
+
+/* =========================
+   GENERAL LINKS STYLING
+   ========================= */
+/* Apply hover effects to general links, excluding buttons and specific elements */
+a:not(.wp-block-button__link):not(.wp-element-button):not(.mt-cart-badge):not(.mt-panel__close):not([class*="button"]):not([role="button"]) {
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+a:not(.wp-block-button__link):not(.wp-element-button):not(.mt-cart-badge):not(.mt-panel__close):not([class*="button"]):not([role="button"]):hover {
+    color: var(--wp--preset--color--accent-light) !important;
+    text-decoration: underline !important;
 }

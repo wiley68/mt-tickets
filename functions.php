@@ -852,6 +852,9 @@ add_action('init', function () {
 		register_block_pattern_category('footer', array(
 			'label' => __('Footer', 'mt-tickets'),
 		));
+		register_block_pattern_category('mt-tickets', array(
+			'label' => __('MT Tickets', 'mt-tickets'),
+		));
 	}
 });
 
