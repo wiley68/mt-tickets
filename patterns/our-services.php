@@ -13,11 +13,11 @@
 	<!-- wp:group {"layout":{"type":"constrained","contentSize":"760px"}} -->
 	<div class="wp-block-group">
 		<!-- wp:heading {"textAlign":"center","level":2} -->
-		<h2 class="has-text-align-center"><?php echo esc_html__('Our Services', 'mt-tickets'); ?></h2>
+		<h2 class="has-text-align-center">Our Services</h2>
 		<!-- /wp:heading -->
 
 		<!-- wp:paragraph {"align":"center"} -->
-		<p class="has-text-align-center"><?php echo esc_html__('Everything you need to list routes, sell tickets, and support passengers, all in one place.', 'mt-tickets'); ?></p>
+		<p class="has-text-align-center">Everything you need to list routes, sell tickets, and support passengers, all in one place.</p>
 		<!-- /wp:paragraph -->
 	</div>
 	<!-- /wp:group -->
@@ -37,15 +37,15 @@
 				<!-- /wp:image -->
 
 				<!-- wp:heading {"level":3,"textColor":"text","style":{"spacing":{"margin":{"top":"12px"}}}} -->
-				<h3 class="has-text-color" style="margin-top:12px;color:var(--wp--preset--color--text)"><?php echo esc_html__('Easy booking', 'mt-tickets'); ?></h3>
+				<h3 class="has-text-color" style="margin-top:12px;color:var(--wp--preset--color--text)">Easy booking</h3>
 				<!-- /wp:heading -->
 
 				<!-- wp:paragraph {"textColor":"text"} -->
-				<p class="has-text-color"><?php echo esc_html__('Passengers can find routes fast and complete a purchase in a couple of clicks.', 'mt-tickets'); ?></p>
+				<p class="has-text-color">Passengers can find routes fast and complete a purchase in a couple of clicks.</p>
 				<!-- /wp:paragraph -->
 
 				<!-- wp:paragraph -->
-				<p><a href="/shop/" style="color:var(--wp--preset--color--accent);text-decoration:none;font-weight:600"><?php echo esc_html__('Learn more', 'mt-tickets'); ?></a></p>
+				<p><a href="/shop/" style="color:var(--wp--preset--color--accent);text-decoration:none;font-weight:600">Learn more</a></p>
 				<!-- /wp:paragraph -->
 
 			</div>
@@ -64,15 +64,15 @@
 				<!-- /wp:image -->
 
 				<!-- wp:heading {"level":3,"textColor":"text","style":{"spacing":{"margin":{"top":"12px"}}}} -->
-				<h3 class="has-text-color" style="margin-top:12px;color:var(--wp--preset--color--text)"><?php echo esc_html__('Carrier tools', 'mt-tickets'); ?></h3>
+				<h3 class="has-text-color" style="margin-top:12px;color:var(--wp--preset--color--text)">Carrier tools</h3>
 				<!-- /wp:heading -->
 
 				<!-- wp:paragraph {"textColor":"text"} -->
-				<p class="has-text-color"><?php echo esc_html__('Manage lines, schedules, and availability with a clean and simple workflow.', 'mt-tickets'); ?></p>
+				<p class="has-text-color">Manage lines, schedules, and availability with a clean and simple workflow.</p>
 				<!-- /wp:paragraph -->
 
 				<!-- wp:paragraph -->
-				<p><a href="/shop/" style="color:var(--wp--preset--color--accent);text-decoration:none;font-weight:600"><?php echo esc_html__('Learn more', 'mt-tickets'); ?></a></p>
+				<p><a href="/shop/" style="color:var(--wp--preset--color--accent);text-decoration:none;font-weight:600">Learn more</a></p>
 				<!-- /wp:paragraph -->
 
 			</div>
@@ -91,15 +91,15 @@
 				<!-- /wp:image -->
 
 				<!-- wp:heading {"level":3,"textColor":"text","style":{"spacing":{"margin":{"top":"12px"}}}} -->
-				<h3 class="has-text-color" style="margin-top:12px;color:var(--wp--preset--color--text)"><?php echo esc_html__('Support ready', 'mt-tickets'); ?></h3>
+				<h3 class="has-text-color" style="margin-top:12px;color:var(--wp--preset--color--text)">Support ready</h3>
 				<!-- /wp:heading -->
 
 				<!-- wp:paragraph {"textColor":"text"} -->
-				<p class="has-text-color"><?php echo esc_html__('Help travelers with clear policies, quick contact, and a smooth account area.', 'mt-tickets'); ?></p>
+				<p class="has-text-color">Help travelers with clear policies, quick contact, and a smooth account area.</p>
 				<!-- /wp:paragraph -->
 
 				<!-- wp:paragraph -->
-				<p><a href="/shop/" style="color:var(--wp--preset--color--accent);text-decoration:none;font-weight:600"><?php echo esc_html__('Learn more', 'mt-tickets'); ?></a></p>
+				<p><a href="/shop/" style="color:var(--wp--preset--color--accent);text-decoration:none;font-weight:600">Learn more</a></p>
 				<!-- /wp:paragraph -->
 
 			</div>
@@ -114,14 +114,14 @@
 	<!-- wp:group {"layout":{"type":"constrained","contentSize":"760px"},"style":{"spacing":{"margin":{"top":"var(--wp--preset--spacing--l)"}}}} -->
 	<div class="wp-block-group" style="margin-top:var(--wp--preset--spacing--l)">
 		<!-- wp:paragraph {"align":"center"} -->
-		<p class="has-text-align-center"><?php echo esc_html__('Ready to explore lines and schedules. Start with our featured routes or browse the full catalog.', 'mt-tickets'); ?></p>
+		<p class="has-text-align-center">Ready to explore lines and schedules. Start with our featured routes or browse the full catalog.</p>
 		<!-- /wp:paragraph -->
 
 		<!-- CTA button -->
 		<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"},"style":{"spacing":{"margin":{"top":"var(--wp--preset--spacing--m)"}}}} -->
 		<div class="wp-block-buttons" style="margin-top:var(--wp--preset--spacing--m)">
 			<!-- wp:button {"url":"/shop/","backgroundColor":"primary","textColor":"background","style":{"spacing":{"padding":{"top":"12px","bottom":"12px","left":"24px","right":"24px"}},"typography":{"fontWeight":"600"}}} -->
-			<div class="wp-block-button"><a class="wp-block-button__link wp-element-button has-primary-background-color has-background-color has-background-background-color has-text-color" href="/shop/" style="padding-top:12px;padding-right:24px;padding-bottom:12px;padding-left:24px;font-weight:600;background-color:var(--wp--preset--color--primary);color:#FFFFFF"><?php echo esc_html__('View all lines', 'mt-tickets'); ?></a></div>
+			<div class="wp-block-button"><a class="wp-block-button__link wp-element-button has-primary-background-color has-background-color has-background-background-color has-text-color" href="/shop/" style="padding-top:12px;padding-right:24px;padding-bottom:12px;padding-left:24px;font-weight:600;background-color:var(--wp--preset--color--primary);color:#FFFFFF">View all lines</a></div>
 			<!-- /wp:button -->
 		</div>
 		<!-- /wp:buttons -->
