@@ -1350,3 +1350,43 @@ footer .wp-block-columns .wp-block-column h4 {
 .mt-footer-column4__description p:last-child {
     margin-bottom: 0;
 }
+
+/* Footer Copyright Row */
+.mt-footer-copyright {
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.mt-footer-copyright__container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mt-footer-copyright__column {
+    display: flex;
+    align-items: center;
+}
+
+.mt-footer-copyright__column--left {
+    flex: 1;
+}
+
+.mt-footer-copyright__column--right {
+    flex-shrink: 0;
+}
+
+.mt-footer-copyright__text {
+    margin: 0;
+    padding: 0;
+    color: var(--wp--preset--color--muted, #64748b);
+    font-size: 14px;
+}
+
+.mt-footer-copyright__image {
+    height: 24px;
+    width: auto;
+    display: block;
+}

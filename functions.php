@@ -313,6 +313,18 @@ add_action('admin_init', function () {
 		'default'           => "Address:\nPhone:\nEmail:\nOpening hours:",
 	));
 
+	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_copyright_text', array(
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_text_field',
+		'default'           => '© MT Tickets. All rights reserved.',
+	));
+
+	register_setting('mt_tickets_footer_settings', 'mt_tickets_footer_payment_icons_id', array(
+		'type'              => 'integer',
+		'sanitize_callback' => 'absint',
+		'default'           => 0,
+	));
+
 	add_settings_section(
 		'mt_tickets_footer_section',
 		__('Footer', 'mt-tickets'),
@@ -443,6 +455,87 @@ add_action('admin_init', function () {
 			$value = get_option('mt_tickets_footer_column4_description', "Address:\nPhone:\nEmail:\nOpening hours:");
 			echo '<textarea name="mt_tickets_footer_column4_description" rows="6" class="large-text">' . esc_textarea($value) . '</textarea>';
 			echo '<p class="description">' . esc_html__('The description displayed in the footer fourth column. Each line will be displayed as a separate paragraph.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-footer-settings',
+		'mt_tickets_footer_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_footer_copyright_text',
+		__('Footer Copyright Text', 'mt-tickets'),
+		function () {
+			$value = get_option('mt_tickets_footer_copyright_text', '© MT Tickets. All rights reserved.');
+			echo '<input type="text" name="mt_tickets_footer_copyright_text" value="' . esc_attr($value) . '" class="regular-text" />';
+			echo '<p class="description">' . esc_html__('The copyright text displayed in the footer bottom row.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-footer-settings',
+		'mt_tickets_footer_section'
+	);
+
+	add_settings_field(
+		'mt_tickets_footer_payment_icons_id',
+		__('Footer Payment Icons Image', 'mt-tickets'),
+		function () {
+			$image_id = (int) get_option('mt_tickets_footer_payment_icons_id', 0);
+			$image_url = $image_id ? wp_get_attachment_image_url($image_id, 'full') : '';
+			$default_image_url = get_theme_file_uri('assets/images/icons_payment.png');
+
+			echo '<div class="mt-footer-payment-icons-preview" style="margin-bottom:10px;">';
+			if ($image_url) {
+				echo '<img src="' . esc_url($image_url) . '" alt="Payment icons" style="max-height:24px;width:auto;display:block;margin-bottom:10px;" />';
+			} else {
+				echo '<img src="' . esc_url($default_image_url) . '" alt="Payment icons (default)" style="max-height:24px;width:auto;display:block;margin-bottom:10px;" />';
+			}
+			echo '</div>';
+
+			echo '<input type="hidden" id="mt_tickets_footer_payment_icons_id" name="mt_tickets_footer_payment_icons_id" value="' . esc_attr($image_id) . '" />';
+			echo '<button type="button" class="button" id="mt_footer_payment_icons_upload_btn">' . esc_html__('Select Image', 'mt-tickets') . '</button> ';
+			if ($image_id) {
+				echo '<button type="button" class="button" id="mt_footer_payment_icons_remove_btn">' . esc_html__('Remove', 'mt-tickets') . '</button> ';
+			}
+			echo '<p class="description">' . esc_html__('Select an image for payment method icons. Recommended height: 24px.', 'mt-tickets') . '</p>';
+
+			// Media uploader script
+			wp_enqueue_media();
+			?>
+			<script>
+			jQuery(document).ready(function($) {
+				var uploadBtn = $('#mt_footer_payment_icons_upload_btn');
+				var removeBtn = $('#mt_footer_payment_icons_remove_btn');
+				var imageIdInput = $('#mt_tickets_footer_payment_icons_id');
+				var preview = $('.mt-footer-payment-icons-preview');
+
+				uploadBtn.on('click', function(e) {
+					e.preventDefault();
+					var mediaUploader = wp.media({
+						title: '<?php echo esc_js(__('Select Payment Icons Image', 'mt-tickets')); ?>',
+						button: {
+							text: '<?php echo esc_js(__('Use this image', 'mt-tickets')); ?>'
+						},
+						multiple: false
+					});
+
+					mediaUploader.on('select', function() {
+						var attachment = mediaUploader.state().get('selection').first().toJSON();
+						imageIdInput.val(attachment.id);
+						preview.html('<img src="' + attachment.url + '" alt="Payment icons" style="max-height:24px;width:auto;display:block;margin-bottom:10px;" />');
+						if (!removeBtn.is(':visible')) {
+							removeBtn.show();
+						}
+					});
+
+					mediaUploader.open();
+				});
+
+				removeBtn.on('click', function(e) {
+					e.preventDefault();
+					imageIdInput.val('0');
+					preview.html('<img src="<?php echo esc_js($default_image_url); ?>" alt="Payment icons (default)" style="max-height:24px;width:auto;display:block;margin-bottom:10px;" />');
+					removeBtn.hide();
+				});
+			});
+			</script>
+			<?php
 		},
 		'mt-tickets-footer-settings',
 		'mt_tickets_footer_section'
@@ -682,7 +775,7 @@ function mt_tickets_get_footer_column3_menu_info()
 add_action('init', function () {
 	$base = __DIR__ . '/blocks';
 
-	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-column1', 'footer-column2', 'footer-column3', 'footer-column4') as $b) {
+	foreach (array('topbar-left', 'topbar-menu', 'header-logo', 'header-menu', 'header-icons', 'footer-column1', 'footer-column2', 'footer-column3', 'footer-column4', 'footer-copyright') as $b) {
 		if (is_dir($base . '/' . $b)) {
 			register_block_type($base . '/' . $b);
 		}
@@ -1250,6 +1343,33 @@ add_action('rest_api_init', function () {
 			return array(
 				'title'       => $title,
 				'description' => $description,
+			);
+		},
+	));
+
+	register_rest_route('mt-tickets/v1', '/footer-copyright', array(
+		'methods'  => 'GET',
+		'permission_callback' => function () {
+			return current_user_can('edit_theme_options');
+		},
+		'callback' => function () {
+			$default_copyright = '© MT Tickets. All rights reserved.';
+			$copyright = get_option('mt_tickets_footer_copyright_text', $default_copyright);
+
+			$image_id = (int) get_option('mt_tickets_footer_payment_icons_id', 0);
+			$image_url = '';
+			$placeholder = get_theme_file_uri('assets/images/icons_payment.png');
+
+			if ($image_id) {
+				$image_url = wp_get_attachment_image_url($image_id, 'full');
+			}
+
+			return array(
+				'copyright' => $copyright,
+				'image'     => array(
+					'id'  => $image_id,
+					'url' => $image_url ?: $placeholder,
+				),
 			);
 		},
 	));

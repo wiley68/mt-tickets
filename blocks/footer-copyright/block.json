@@ -1,0 +1,14 @@
+{
+    "apiVersion": 3,
+    "name": "mt-tickets/footer-copyright",
+    "title": "MT Tickets: Footer Copyright",
+    "category": "widgets",
+    "description": "Renders the footer copyright row with copyright text and payment icons image.",
+    "textdomain": "mt-tickets",
+    "supports": {
+        "html": false,
+        "inserter": false
+    },
+    "editorScript": "file:./index.js",
+    "render": "file:./render.php"
+}
