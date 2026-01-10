@@ -856,6 +856,31 @@ add_action('init', function () {
 			'label' => __('MT Tickets', 'mt-tickets'),
 		));
 	}
+
+	// Register block patterns
+	if (function_exists('register_block_pattern')) {
+		// Register Our Services pattern
+		ob_start();
+		include get_template_directory() . '/patterns/our-services.php';
+		$our_services_content = ob_get_clean();
+		register_block_pattern('mt-tickets/our-services', array(
+			'title'       => __('Our Services', 'mt-tickets'),
+			'description' => __('A services section with three feature cards.', 'mt-tickets'),
+			'categories'  => array('mt-tickets'),
+			'content'     => $our_services_content,
+		));
+
+		// Register About Us pattern
+		ob_start();
+		include get_template_directory() . '/patterns/about-us.php';
+		$about_us_content = ob_get_clean();
+		register_block_pattern('mt-tickets/about-us', array(
+			'title'       => __('About Us', 'mt-tickets'),
+			'description' => __('A two-column about section with image and feature highlights.', 'mt-tickets'),
+			'categories'  => array('mt-tickets'),
+			'content'     => $about_us_content,
+		));
+	}
 });
 
 /**

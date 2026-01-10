@@ -1420,3 +1420,44 @@ a:not(.wp-block-button__link):not(.wp-element-button):not(.mt-cart-badge):not(.m
     color: var(--wp--preset--color--accent-light) !important;
     text-decoration: underline !important;
 }
+
+/* =========================
+   ABOUT US PATTERN
+   ========================= */
+/* Feature icon styling */
+.mt-about-feature-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    color: var(--wp--preset--color--muted);
+    transition: color 0.2s ease;
+}
+
+.mt-about-feature-icon img {
+    width: 24px;
+    height: 24px;
+    display: block;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(48%) sepia(8%) saturate(1038%) hue-rotate(169deg) brightness(94%) contrast(87%);
+    transition: filter 0.2s ease;
+}
+
+/* Feature block hover effect */
+.wp-block-group:has(.mt-about-feature-icon):hover .mt-about-feature-icon img {
+    filter: brightness(0) saturate(100%) invert(60%) sepia(100%) saturate(1000%) hue-rotate(150deg) brightness(95%) contrast(90%);
+}
+
+/* Ensure feature blocks have proper spacing */
+.wp-block-group:has(.mt-about-feature-icon) {
+    align-items: flex-start;
+    gap: 16px;
+}
+
+/* Ensure accent color is applied for About Us label */
+.has-accent-color {
+    color: var(--wp--preset--color--accent) !important;
+}
