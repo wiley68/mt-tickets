@@ -880,6 +880,17 @@ add_action('init', function () {
 			'categories'  => array('mt-tickets'),
 			'content'     => $about_us_content,
 		));
+
+		// Register Our Fleet pattern
+		ob_start();
+		include get_template_directory() . '/patterns/our-fleet.php';
+		$our_fleet_content = ob_get_clean();
+		register_block_pattern('mt-tickets/our-fleet', array(
+			'title'       => __('Our Fleet', 'mt-tickets'),
+			'description' => __('A fleet section with product category display.', 'mt-tickets'),
+			'categories'  => array('mt-tickets'),
+			'content'     => $our_fleet_content,
+		));
 	}
 });
 
