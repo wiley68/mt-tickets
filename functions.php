@@ -630,7 +630,9 @@ add_action('admin_init', function () {
 		'mt_tickets_back_to_top_enabled',
 		__('Back to Top Button', 'mt-tickets'),
 		function () {
-			$value = get_option('mt_tickets_back_to_top_enabled', false);
+			$value = get_option('mt_tickets_back_to_top_enabled', true);
+			// Hidden input to ensure value is always sent (even when unchecked)
+			echo '<input type="hidden" name="mt_tickets_back_to_top_enabled" value="0" />';
 			echo '<label>';
 			echo '<input type="checkbox" name="mt_tickets_back_to_top_enabled" value="1" ' . checked($value, true, false) . ' />';
 			echo ' ' . esc_html__('Show Back to Top button', 'mt-tickets');
