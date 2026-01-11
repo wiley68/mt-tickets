@@ -768,6 +768,10 @@ function mt_tickets_render_footer_settings_page()
 function mt_tickets_render_settings_page()
 {
 	if (! current_user_can('manage_options')) return;
+
+	// Check if home page already exists
+	$home_page_id = get_option('page_on_front', 0);
+	$home_page_exists = $home_page_id > 0;
 ?>
 	<div class="wrap">
 		<h1><?php echo esc_html__('Settings', 'mt-tickets'); ?></h1>
@@ -778,7 +782,104 @@ function mt_tickets_render_settings_page()
 			submit_button();
 			?>
 		</form>
+
+		<div class="mt-create-home-page-section" style="margin-top: 30px; padding: 20px; background: #fff; border: 1px solid #ccd0d4; border-radius: 4px;">
+			<h2><?php echo esc_html__('Home Page Setup', 'mt-tickets'); ?></h2>
+
+			<?php if ($home_page_exists) : ?>
+				<?php
+				$home_page = get_post($home_page_id);
+				if ($home_page) {
+					$home_page_title = $home_page->post_title;
+				} else {
+					$home_page_title = __('Unknown', 'mt-tickets');
+				}
+				?>
+				<p><?php
+					printf(
+						esc_html__('There is already a homepage created: %s', 'mt-tickets'),
+						'<strong>' . esc_html($home_page_title) . '</strong>'
+					);
+					?></p>
+				<p class="description" style="color: #d63638; margin-top: 10px;">
+					<?php echo esc_html__('Creating a new home page will replace the current one as your front page.', 'mt-tickets'); ?>
+				</p>
+				<button type="button" id="mt-create-home-page-btn" class="button button-primary" style="margin-top: 10px;" data-has-home-page="true">
+					<?php echo esc_html__('Create New Home Page', 'mt-tickets'); ?>
+				</button>
+			<?php else : ?>
+				<p><?php echo esc_html__('No active home page.', 'mt-tickets'); ?></p>
+				<p class="description" style="margin-top: 10px;">
+					<?php echo esc_html__('Create a pre-configured home page with all the essential sections. This will set up your home page and activate it as the front page.', 'mt-tickets'); ?>
+				</p>
+				<button type="button" id="mt-create-home-page-btn" class="button button-primary" style="margin-top: 10px;" data-has-home-page="false">
+					<?php echo esc_html__('Create Home Page', 'mt-tickets'); ?>
+				</button>
+			<?php endif; ?>
+
+			<span id="mt-create-home-page-spinner" class="spinner" style="float: none; margin-left: 10px; visibility: hidden;"></span>
+			<div id="mt-create-home-page-message" style="margin-top: 10px;"></div>
+		</div>
 	</div>
+
+	<script>
+		jQuery(document).ready(function($) {
+			$('#mt-create-home-page-btn').on('click', function(e) {
+				e.preventDefault();
+
+				var $btn = $(this);
+				var $spinner = $('#mt-create-home-page-spinner');
+				var $message = $('#mt-create-home-page-message');
+				var hasHomePage = $btn.data('has-home-page') === true;
+
+				// Show confirmation dialog
+				var confirmMessage = hasHomePage ?
+					'<?php echo esc_js(__('Are you sure you want to create a new home page? This will replace your current home page as the front page.', 'mt-tickets')); ?>' :
+					'<?php echo esc_js(__('Are you sure you want to create a new home page? This will set it as your front page.', 'mt-tickets')); ?>';
+
+				if (!confirm(confirmMessage)) {
+					return;
+				}
+
+				$btn.prop('disabled', true);
+				$spinner.css('visibility', 'visible');
+				$message.html('');
+
+				$.ajax({
+					url: '<?php echo esc_url(admin_url('admin-ajax.php')); ?>',
+					type: 'POST',
+					data: {
+						action: 'mt_create_home_page',
+						nonce: '<?php echo wp_create_nonce('mt_create_home_page_nonce'); ?>'
+					},
+					success: function(response) {
+						$spinner.css('visibility', 'hidden');
+						$btn.prop('disabled', false);
+
+						if (response.success) {
+							$message.html('<div class="notice notice-success"><p>' + response.data.message + '</p></div>');
+							if (response.data.edit_url) {
+								setTimeout(function() {
+									window.location.href = response.data.edit_url;
+								}, 2000);
+							} else {
+								setTimeout(function() {
+									location.reload();
+								}, 2000);
+							}
+						} else {
+							$message.html('<div class="notice notice-error"><p>' + (response.data.message || '<?php echo esc_js(__('An error occurred. Please try again.', 'mt-tickets')); ?>') + '</p></div>');
+						}
+					},
+					error: function() {
+						$spinner.css('visibility', 'hidden');
+						$btn.prop('disabled', false);
+						$message.html('<div class="notice notice-error"><p><?php echo esc_js(__('An error occurred. Please try again.', 'mt-tickets')); ?></p></div>');
+					}
+				});
+			});
+		});
+	</script>
 	<?php
 }
 
@@ -1570,6 +1671,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
 		$hook !== 'toplevel_page_mt-tickets-overview' &&
 		$hook !== 'mt-tickets_page_mt-tickets-overview' &&
 		$hook !== 'mt-tickets_page_mt-tickets-settings' &&
+		$hook !== 'mt-tickets_page_mt-tickets-settings-page' &&
 		$hook !== 'mt-tickets_page_mt-tickets-footer-settings'
 	) {
 		return;
@@ -1589,6 +1691,80 @@ add_action('admin_enqueue_scripts', function ($hook) {
 		'placeholder' => get_theme_file_uri('assets/images/logo-placeholder.svg'),
 	));
 });
+
+/**
+ * AJAX handler for creating home page
+ */
+add_action('wp_ajax_mt_create_home_page', 'mt_create_home_page');
+
+function mt_create_home_page()
+{
+	// Verify nonce
+	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mt_create_home_page_nonce')) {
+		wp_send_json_error(array('message' => __('Security check failed.', 'mt-tickets')));
+		return;
+	}
+
+	// Check permissions
+	if (!current_user_can('manage_options')) {
+		wp_send_json_error(array('message' => __('You do not have permission to perform this action.', 'mt-tickets')));
+		return;
+	}
+
+	// Load home page content from file
+	$home_content_file = get_template_directory() . '/includes/home-page-content.html';
+	$home_content = '';
+
+	if (file_exists($home_content_file)) {
+		$home_content = file_get_contents($home_content_file);
+		// Remove HTML comments that might interfere
+		$home_content = preg_replace('/<!--\s*This file.*?-->/s', '', $home_content);
+		$home_content = trim($home_content);
+	}
+
+	// Fallback to default content if file doesn't exist or is empty
+	if (empty($home_content)) {
+		$home_content = '<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
+<main class="wp-block-group">
+	<!-- wp:post-content {"layout":{"type":"constrained"}} /-->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->';
+	}
+
+	// Always create a new page (don't check for existing)
+	// This allows admin to create a fresh home page even if one already exists
+	$page_data = array(
+		'post_title'    => __('Home', 'mt-tickets'),
+		'post_content'  => $home_content,
+		'post_status'   => 'publish',
+		'post_type'     => 'page',
+		'post_author'   => get_current_user_id(),
+	);
+
+	$page_id = wp_insert_post($page_data);
+
+	if (is_wp_error($page_id) || !$page_id) {
+		wp_send_json_error(array('message' => __('Failed to create or update page.', 'mt-tickets')));
+		return;
+	}
+
+	// Set as front page
+	update_option('show_on_front', 'page');
+	update_option('page_on_front', $page_id);
+
+	// Get edit URL
+	$edit_url = admin_url('post.php?post=' . $page_id . '&action=edit');
+
+	wp_send_json_success(array(
+		'message'  => __('Home page created successfully! Redirecting to edit page...', 'mt-tickets'),
+		'page_id'  => $page_id,
+		'edit_url' => $edit_url,
+	));
+}
 
 /**
  * Add Back to Top button
