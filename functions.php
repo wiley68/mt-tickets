@@ -47,6 +47,16 @@ add_action('admin_menu', function () {
 		'mt_tickets_render_overview_page'
 	);
 
+	// Settings submenu
+	add_submenu_page(
+		$parent_slug,
+		__('Settings', 'mt-tickets'),
+		__('Settings', 'mt-tickets'),
+		'manage_options',
+		'mt-tickets-settings-page',
+		'mt_tickets_render_settings_page'
+	);
+
 	// Header submenu
 	add_submenu_page(
 		$parent_slug,
@@ -599,6 +609,37 @@ add_action('admin_init', function () {
 		'mt-tickets-footer-settings',
 		'mt_tickets_footer_section'
 	);
+
+	// Settings page - Back to top button
+	register_setting('mt_tickets_settings_page', 'mt_tickets_back_to_top_enabled', array(
+		'type'              => 'boolean',
+		'sanitize_callback' => function ($value) {
+			return (bool) $value;
+		},
+		'default'           => true,
+	));
+
+	add_settings_section(
+		'mt_tickets_settings_section',
+		__('General Settings', 'mt-tickets'),
+		'__return_false',
+		'mt-tickets-settings-page'
+	);
+
+	add_settings_field(
+		'mt_tickets_back_to_top_enabled',
+		__('Back to Top Button', 'mt-tickets'),
+		function () {
+			$value = get_option('mt_tickets_back_to_top_enabled', false);
+			echo '<label>';
+			echo '<input type="checkbox" name="mt_tickets_back_to_top_enabled" value="1" ' . checked($value, true, false) . ' />';
+			echo ' ' . esc_html__('Show Back to Top button', 'mt-tickets');
+			echo '</label>';
+			echo '<p class="description">' . esc_html__('Enable a floating button in the bottom right corner that scrolls to the top of the page when clicked.', 'mt-tickets') . '</p>';
+		},
+		'mt-tickets-settings-page',
+		'mt_tickets_settings_section'
+	);
 });
 
 function mt_tickets_render_overview_page()
@@ -717,6 +758,23 @@ function mt_tickets_render_footer_settings_page()
 			<?php
 			settings_fields('mt_tickets_footer_settings');
 			do_settings_sections('mt-tickets-footer-settings');
+			submit_button();
+			?>
+		</form>
+	</div>
+<?php
+}
+
+function mt_tickets_render_settings_page()
+{
+	if (! current_user_can('manage_options')) return;
+?>
+	<div class="wrap">
+		<h1><?php echo esc_html__('Settings', 'mt-tickets'); ?></h1>
+		<form method="post" action="options.php">
+			<?php
+			settings_fields('mt_tickets_settings_page');
+			do_settings_sections('mt-tickets-settings-page');
 			submit_button();
 			?>
 		</form>
@@ -1239,7 +1297,7 @@ function mt_refresh_mini_cart()
 					</div>
 				</div>
 			</div>
-<?php
+	<?php
 		}
 	} else {
 		echo '<div class="mt-mini-cart__empty">' . esc_html__('Your cart is empty.', 'mt-tickets') . '</div>';
@@ -1530,4 +1588,21 @@ add_action('admin_enqueue_scripts', function ($hook) {
 	wp_localize_script('mt-tickets-admin-settings', 'MT_TICKETS_ADMIN', array(
 		'placeholder' => get_theme_file_uri('assets/images/logo-placeholder.svg'),
 	));
+});
+
+/**
+ * Add Back to Top button
+ */
+add_action('wp_footer', function () {
+	$enabled = get_option('mt_tickets_back_to_top_enabled', true);
+	if (!$enabled) {
+		return;
+	}
+	?>
+	<button id="mt-back-to-top" class="mt-back-to-top" aria-label="<?php echo esc_attr__('Back to top', 'mt-tickets'); ?>" title="<?php echo esc_attr__('Back to top', 'mt-tickets'); ?>">
+		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M12 19V5M5 12l7-7 7 7" />
+		</svg>
+	</button>
+<?php
 });

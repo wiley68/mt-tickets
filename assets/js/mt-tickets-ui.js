@@ -88,7 +88,7 @@
         if (btn) {
             e.preventDefault();
             const panelId = btn.getAttribute('data-mt-open');
-            
+
             // If clicking account button
             if (panelId === '#mt-panel-account') {
                 // If user is logged in, redirect to account page
@@ -100,7 +100,7 @@
                         return;
                     }
                 }
-                
+
                 // If we're on account page, redirect to account URL
                 if (isOnAccountPage()) {
                     const accountUrl = btn.getAttribute('data-account-url');
@@ -110,7 +110,7 @@
                     }
                 }
             }
-            
+
             openPanel(panelId);
             return;
         }
@@ -927,8 +927,8 @@
                 }
             } else {
                 // Show error message
-                const errorMessage = data.data && data.data.message 
-                    ? data.data.message 
+                const errorMessage = data.data && data.data.message
+                    ? data.data.message
                     : 'Unknown email address. Check again or try your username.';
                 showAccountError(errorEl, errorMessage);
                 loginBtn.disabled = false;
@@ -945,15 +945,15 @@
     // Helper function to show account error
     function showAccountError(errorEl, message, formEl) {
         if (!errorEl) return;
-        
+
         // Strip HTML tags and decode HTML entities
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = message;
         const textContent = tempDiv.textContent || tempDiv.innerText || '';
-        
+
         errorEl.textContent = textContent.trim();
         errorEl.style.display = 'block';
-        
+
         // Scroll to error if needed
         errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
@@ -961,5 +961,33 @@
         setTimeout(() => {
             errorEl.style.display = 'none';
         }, 5000);
+    }
+
+    // Back to Top Button
+    const backToTopBtn = qs('#mt-back-to-top');
+    if (backToTopBtn) {
+        // Show/hide button based on scroll position
+        function toggleBackToTop() {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        }
+
+        // Initial check
+        toggleBackToTop();
+
+        // Listen for scroll events
+        window.addEventListener('scroll', toggleBackToTop, { passive: true });
+
+        // Smooth scroll to top on click
+        backToTopBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
     }
 })();
