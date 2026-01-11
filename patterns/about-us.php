@@ -48,8 +48,8 @@
 				<!-- /wp:paragraph -->
 
 				<!-- Row 4: Feature block 1 -->
-				<!-- wp:group {"style":{"spacing":{"margin":{"bottom":"16px"},"padding":{"top":"16px","bottom":"16px","left":"0","right":"0"}}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
-				<div class="wp-block-group" style="margin-bottom:16px;padding-top:16px;padding-right:0;padding-bottom:16px;padding-left:0">
+				<!-- wp:group {"style":{"spacing":{"margin":{"bottom":"16px"},"padding":{"top":"16px","bottom":"16px","left":"0","right":"0"}}},"layout":{"type":"flex","flexWrap":"nowrap"},"className":"mt-about-feature-block"} -->
+				<div class="wp-block-group mt-about-feature-block" style="margin-bottom:16px;padding-top:16px;padding-right:0;padding-bottom:16px;padding-left:0">
 					<!-- wp:image {"width":48,"height":48,"sizeSlug":"full","linkDestination":"none","className":"mt-about-feature-icon"} -->
 					<figure class="wp-block-image size-full is-resized mt-about-feature-icon"><img src="<?php echo esc_url(get_theme_file_uri('assets/images/icon-booking.svg')); ?>" alt="" width="48" height="48" /></figure>
 					<!-- /wp:image -->
@@ -67,8 +67,8 @@
 				<!-- /wp:group -->
 
 				<!-- Row 5: Feature block 2 -->
-				<!-- wp:group {"style":{"spacing":{"margin":{"bottom":"24px"},"padding":{"top":"16px","bottom":"16px","left":"0","right":"0"}}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
-				<div class="wp-block-group" style="margin-bottom:24px;padding-top:16px;padding-right:0;padding-bottom:16px;padding-left:0">
+				<!-- wp:group {"style":{"spacing":{"margin":{"bottom":"24px"},"padding":{"top":"16px","bottom":"16px","left":"0","right":"0"}}},"layout":{"type":"flex","flexWrap":"nowrap"},"className":"mt-about-feature-block"} -->
+				<div class="wp-block-group mt-about-feature-block" style="margin-bottom:24px;padding-top:16px;padding-right:0;padding-bottom:16px;padding-left:0">
 					<!-- wp:image {"width":48,"height":48,"sizeSlug":"full","linkDestination":"none","className":"mt-about-feature-icon"} -->
 					<figure class="wp-block-image size-full is-resized mt-about-feature-icon"><img src="<?php echo esc_url(get_theme_file_uri('assets/images/icon-schedule.svg')); ?>" alt="" width="48" height="48" /></figure>
 					<!-- /wp:image -->

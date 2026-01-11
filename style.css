@@ -1446,13 +1446,13 @@ a:not(.wp-block-button__link):not(.wp-element-button):not(.mt-cart-badge):not(.m
     transition: filter 0.2s ease;
 }
 
-/* Feature block hover effect */
-.wp-block-group:has(.mt-about-feature-icon):hover .mt-about-feature-icon img {
+/* Feature block hover effect - only when hovering over the specific feature block */
+.mt-about-feature-block:hover .mt-about-feature-icon img {
     filter: brightness(0) saturate(100%) invert(60%) sepia(100%) saturate(1000%) hue-rotate(150deg) brightness(95%) contrast(90%);
 }
 
 /* Ensure feature blocks have proper spacing */
-.wp-block-group:has(.mt-about-feature-icon) {
+.mt-about-feature-block {
     align-items: flex-start;
     gap: 16px;
 }
