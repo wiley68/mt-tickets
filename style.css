@@ -1461,3 +1461,17 @@ a:not(.wp-block-button__link):not(.wp-element-button):not(.mt-cart-badge):not(.m
 .has-accent-color {
     color: var(--wp--preset--color--accent) !important;
 }
+
+/* =========================
+   TESTIMONIALS PATTERN
+   ========================= */
+/* Ensure all testimonial cards have equal height */
+section:has(.wp-block-columns) .wp-block-columns {
+    align-items: stretch;
+}
+
+section:has(.wp-block-columns) .wp-block-column>.wp-block-group {
+    height: 220px !important;
+    min-height: 220px !important;
+    box-sizing: border-box;
+}

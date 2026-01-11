@@ -891,6 +891,17 @@ add_action('init', function () {
 			'categories'  => array('mt-tickets'),
 			'content'     => $our_fleet_content,
 		));
+
+		// Register Testimonials pattern
+		ob_start();
+		include get_template_directory() . '/patterns/testimonials.php';
+		$testimonials_content = ob_get_clean();
+		register_block_pattern('mt-tickets/testimonials', array(
+			'title'       => __('Testimonials', 'mt-tickets'),
+			'description' => __('A testimonials section with three customer review cards.', 'mt-tickets'),
+			'categories'  => array('mt-tickets'),
+			'content'     => $testimonials_content,
+		));
 	}
 });
 
